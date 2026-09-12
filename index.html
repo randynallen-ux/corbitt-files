@@ -4,6 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#14110f">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png" type="image/png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Corbitt Files">
 <title>The Corbitt Files</title>
 <style>
   :root{
@@ -112,6 +119,7 @@
   <button data-go="keeper">I am the Keeper</button>
   <button data-go="tutorial">Never played before? Learn to play</button>
   <p class="note">Everything is saved on this device only. Nothing is sent anywhere.</p>
+  <p class="note" id="offline-status" role="status" aria-live="polite">Checking whether this is saved for offline use.</p>
 </section>
 
 <!-- ================= CHOOSE ================= -->
@@ -2699,9 +2707,50 @@ document.getElementById("krun-reset").addEventListener("click", function(){
   announce("Session reset. Back to the opening scene, no handouts given.");
 });
 
+/* ---------------- offline ---------------- */
+
+// One status line on the home screen, so she can tell by ear whether the app is
+// safe to open at a table with no signal.
+function setOfflineStatus(){
+  const el = document.getElementById("offline-status");
+  if(!el) return;
+  let msg;
+  if(!("serviceWorker" in navigator)){
+    msg = "This browser cannot save the app offline. It will need a connection.";
+  } else if(!navigator.onLine){
+    msg = navigator.serviceWorker.controller
+      ? "You are offline, and everything here still works."
+      : "You are offline and this was not saved yet. Reconnect once to save it.";
+  } else if(navigator.serviceWorker.controller){
+    msg = "Saved on this device. This works with no wifi and no signal.";
+  } else {
+    msg = "Saving for offline use.";
+  }
+  if(el.textContent !== msg) el.textContent = msg;
+}
+
+if("serviceWorker" in navigator){
+  window.addEventListener("load", function(){
+    navigator.serviceWorker.register("sw.js").then(function(){
+      return navigator.serviceWorker.ready;
+    }).then(function(){
+      // controller only appears once it is actually in charge of this page
+      if(navigator.serviceWorker.controller) setOfflineStatus();
+      else navigator.serviceWorker.addEventListener("controllerchange", setOfflineStatus);
+      setTimeout(setOfflineStatus, 400);
+    }).catch(function(){
+      const el = document.getElementById("offline-status");
+      if(el) el.textContent = "Could not save this for offline use. It will need a connection.";
+    });
+  });
+}
+window.addEventListener("online",  setOfflineStatus);
+window.addEventListener("offline", setOfflineStatus);
+
 /* ---------------- boot ---------------- */
 
 load();
+setOfflineStatus();
 buildChoose();
 buildSanSelect();
 buildModRow();
