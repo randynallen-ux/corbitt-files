@@ -1,0 +1,2717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#14110f">
+<title>The Corbitt Files</title>
+<style>
+  :root{
+    --ink:#f2ece1; --ink-dim:#b9ae9c; --bg:#14110f; --panel:#1f1b17;
+    --panel-2:#2a241e; --line:#4a3f33; --accent:#d4a95e; --accent-ink:#14110f;
+    --good:#8ecb97; --bad:#e8827a; --warn:#e6b95c;
+    --pad:1rem; --radius:12px;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font:1.0625rem/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  }
+  .wrap{max-width:46rem;margin:0 auto;padding:1rem 1rem 5rem}
+  h1,h2,h3{line-height:1.2;margin:0 0 .5rem}
+  h1{font-size:1.6rem}
+  h2{font-size:1.35rem;margin-top:0}
+  h3{font-size:1.1rem;margin-top:1.75rem;color:var(--accent)}
+  h4{font-size:1rem;margin:1.1rem 0 .35rem}
+  h1:focus,h2:focus{outline:3px solid var(--accent);outline-offset:4px;border-radius:4px}
+  p{margin:0 0 .75rem}
+  .sub{color:var(--ink-dim);margin-bottom:1.25rem}
+  .sr-only{
+    position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;
+    overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;
+  }
+  button{
+    font:inherit;color:var(--ink);background:var(--panel);border:1px solid var(--line);
+    border-radius:var(--radius);padding:.85rem 1rem;min-height:3rem;width:100%;
+    text-align:left;cursor:pointer;margin:0 0 .5rem;-webkit-tap-highlight-color:transparent;
+  }
+  button:active{background:var(--panel-2)}
+  button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:600}
+  button.ghost{background:transparent}
+  button.small{min-height:2.75rem;padding:.6rem .8rem;width:auto}
+  .row{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin-bottom:.75rem}
+  .row button{width:auto;flex:1 1 6rem;margin:0;text-align:center}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:var(--pad);margin:0 0 1rem}
+  .res{background:var(--panel-2);border:2px solid var(--line);border-radius:var(--radius);padding:1rem;margin:0 0 1rem}
+  .res .verdict{font-size:1.45rem;font-weight:700;margin:0 0 .25rem}
+  .res .detail{color:var(--ink-dim);margin:0}
+  .res.is-good{border-color:var(--good)} .res.is-good .verdict{color:var(--good)}
+  .res.is-bad{border-color:var(--bad)} .res.is-bad .verdict{color:var(--bad)}
+  .res.is-warn{border-color:var(--warn)} .res.is-warn .verdict{color:var(--warn)}
+  .skill .sname{display:block;font-weight:600}
+  .skill .svals{display:block;color:var(--ink-dim);font-size:.95rem}
+  .skill.untrained .sname{font-weight:400;color:var(--ink-dim)}
+  .track{border:1px solid var(--line);border-radius:var(--radius);padding:.75rem;margin:0 0 .75rem;background:var(--panel)}
+  .track h3{margin:0 0 .25rem;color:var(--ink);font-size:1.05rem}
+  .track .val{font-size:1.9rem;font-weight:700;color:var(--accent);margin:0 0 .5rem}
+  .num{
+    font:inherit;font-size:1rem;color:var(--ink);background:var(--bg);
+    border:1px solid var(--line);border-radius:8px;padding:.6rem;width:4.5rem;min-height:3rem;
+  }
+  label{display:block;margin:0 0 .35rem;color:var(--ink-dim)}
+  select{
+    font:inherit;font-size:1rem;color:var(--ink);background:var(--bg);border:1px solid var(--line);
+    border-radius:8px;padding:.7rem;width:100%;min-height:3rem;margin:0 0 .75rem;
+  }
+  .flags button[aria-pressed="true"]{background:var(--bad);border-color:var(--bad);color:#1a0f0e;font-weight:700}
+  .mods button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
+  ul,ol{margin:0 0 .75rem;padding-left:1.4rem}
+  li{margin-bottom:.4rem}
+  dt{font-weight:700;color:var(--accent);margin-top:.75rem}
+  dd{margin:0 0 .25rem}
+  .note{border-left:3px solid var(--accent);padding-left:.75rem;color:var(--ink-dim);margin:0 0 1rem}
+  hr{border:0;border-top:1px solid var(--line);margin:1.5rem 0}
+  .screen[hidden]{display:none}
+  .backbar{position:sticky;top:0;background:var(--bg);padding:.5rem 0;z-index:5;border-bottom:1px solid var(--line);margin-bottom:1rem}
+  .backbar button{width:auto;margin:0;min-height:2.75rem}
+  table{border-collapse:collapse;width:100%;margin:0 0 1rem}
+  th,td{border:1px solid var(--line);padding:.5rem;text-align:left;font-size:.97rem}
+  th{background:var(--panel-2);color:var(--accent)}
+  .scroll{overflow-x:auto}
+  /* Printing the quick reference gives a physical sheet for behind the screen. */
+  @media print{
+    body{background:#fff;color:#000;font-size:9.5pt}
+    .wrap{max-width:none;padding:0}
+    .backbar,button,select,label{display:none!important}
+    h1,h2,h3,h4{color:#000}
+    h2{font-size:15pt;margin-bottom:.3rem}
+    h3{font-size:11pt;margin:.8rem 0 .2rem;border-bottom:1px solid #000}
+    .panel,.res,.track,.note{border-color:#666;background:#fff}
+    .note,.sub,.kv{color:#000}
+    th{background:#e8e8e8;color:#000}
+    th,td{border-color:#666;padding:.2rem .35rem}
+    table,ul,ol,.panel{page-break-inside:avoid}
+    p{margin:0 0 .3rem}
+    li{margin-bottom:.1rem}
+  }
+</style>
+</head>
+<body>
+
+<div id="announcer" class="sr-only" role="status" aria-live="assertive" aria-atomic="true"></div>
+<div id="polite" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
+
+<div class="wrap">
+
+<!-- ================= HOME ================= -->
+<section id="home" class="screen" aria-labelledby="home-h">
+  <h1 id="home-h" tabindex="-1">The Corbitt Files</h1>
+  <p class="sub">A play aid for Call of Cthulhu 7th Edition Quick-Start and the scenario <em>The Haunting</em>.</p>
+  <button class="primary" data-go="choose">I am a player</button>
+  <button data-go="keeper">I am the Keeper</button>
+  <button data-go="tutorial">Never played before? Learn to play</button>
+  <p class="note">Everything is saved on this device only. Nothing is sent anywhere.</p>
+</section>
+
+<!-- ================= CHOOSE ================= -->
+<section id="choose" class="screen" hidden aria-labelledby="choose-h">
+  <div class="backbar"><button class="ghost small" data-go="home">Back to start</button></div>
+  <h2 id="choose-h" tabindex="-1">Choose your investigator</h2>
+  <p class="sub">Four ready-made investigators. You decide their name and pronouns yourself.</p>
+  <div id="choose-list"></div>
+</section>
+
+<!-- ================= SHEET HUB ================= -->
+<section id="sheet" class="screen" hidden aria-labelledby="sheet-h">
+  <div class="backbar"><button class="ghost small" data-go="choose">Change investigator</button></div>
+  <h2 id="sheet-h" tabindex="-1">My investigator</h2>
+  <p class="sub" id="sheet-sub"></p>
+  <button data-go="tutorial">Learn to play</button>
+  <button class="primary" data-go="roll">Roll a skill</button>
+  <button data-go="status">Health and sanity</button>
+  <button data-go="combat">Combat</button>
+  <button data-go="sanity">Sanity roll</button>
+  <button data-go="about">About my investigator</button>
+  <button data-go="handouts">Handouts</button>
+  <button data-go="quickrules">Quick rules reminder</button>
+</section>
+
+<!-- ================= ROLL ================= -->
+<section id="roll" class="screen" hidden aria-labelledby="roll-h">
+  <div class="backbar"><button class="ghost small" data-go="sheet">Back to my investigator</button></div>
+  <h2 id="roll-h" tabindex="-1">Roll a skill</h2>
+  <div class="res" id="res1" role="group" aria-label="Last roll">
+    <p class="verdict" id="res1-v">No roll yet</p>
+    <p class="detail" id="res1-d">Choose a skill below to roll.</p>
+  </div>
+  <div id="push-wrap"></div>
+  <h3>Dice modifier</h3>
+  <p class="sub">Only if the Keeper says so. Resets after each roll.</p>
+  <div class="row mods" id="mod-row"></div>
+  <h3>Characteristics</h3>
+  <div id="chars-list"></div>
+  <h3>My skills</h3>
+  <div id="skills-list"></div>
+  <h3>Every other skill</h3>
+  <p class="sub">At the starting value everyone has.</p>
+  <div id="untrained-list"></div>
+</section>
+
+<!-- ================= STATUS ================= -->
+<section id="status" class="screen" hidden aria-labelledby="status-h">
+  <div class="backbar"><button class="ghost small" data-go="sheet">Back to my investigator</button></div>
+  <h2 id="status-h" tabindex="-1">Health and sanity</h2>
+  <div id="tracks"></div>
+  <h3>Conditions</h3>
+  <p class="sub">Tap to turn a condition on or off.</p>
+  <div id="flags" class="flags"></div>
+  <hr>
+  <button class="ghost" id="btn-reset">Reset this investigator to full</button>
+</section>
+
+<!-- ================= COMBAT ================= -->
+<section id="combat" class="screen" hidden aria-labelledby="combat-h">
+  <div class="backbar"><button class="ghost small" data-go="sheet">Back to my investigator</button></div>
+  <h2 id="combat-h" tabindex="-1">Combat</h2>
+  <div class="res" id="res2" role="group" aria-label="Last combat roll">
+    <p class="verdict" id="res2-v">No roll yet</p>
+    <p class="detail" id="res2-d">Choose an attack or a defence below.</p>
+  </div>
+  <h3>My attacks</h3>
+  <div id="weapons-list"></div>
+  <h3>Defending</h3>
+  <div id="defend-list"></div>
+  <h3>Roll damage</h3>
+  <div id="dmg-list"></div>
+  <p class="note">You cannot push a combat roll. If you miss, you simply try again next round.</p>
+</section>
+
+<!-- ================= SANITY ================= -->
+<section id="sanity" class="screen" hidden aria-labelledby="sanity-h">
+  <div class="backbar"><button class="ghost small" data-go="sheet">Back to my investigator</button></div>
+  <h2 id="sanity-h" tabindex="-1">Sanity roll</h2>
+  <div class="res" id="res3" role="group" aria-label="Last sanity roll">
+    <p class="verdict" id="res3-v">No roll yet</p>
+    <p class="detail" id="res3-d">The Keeper will say the loss, for example one slash one D eight.</p>
+  </div>
+  <label for="san-loss">Sanity loss the Keeper called for</label>
+  <select id="san-loss"></select>
+  <button class="primary" id="btn-san-roll">Make the Sanity roll</button>
+  <div id="san-followup"></div>
+  <p class="note">You cannot push a Sanity roll.</p>
+  <h3>Loss with no roll</h3>
+  <p class="sub">Some things cost Sanity outright, with no roll to resist. Reading the Corbitt diaries costs 1D4.</p>
+  <label for="san-flat">Amount to lose</label>
+  <select id="san-flat"></select>
+  <button id="btn-san-flat">Lose that Sanity</button>
+</section>
+
+<!-- ================= ABOUT ================= -->
+<section id="about" class="screen" hidden aria-labelledby="about-h">
+  <div class="backbar"><button class="ghost small" data-go="sheet">Back to my investigator</button></div>
+  <h2 id="about-h" tabindex="-1">About my investigator</h2>
+  <div id="about-body"></div>
+</section>
+
+<!-- ================= QUICK RULES ================= -->
+<section id="quickrules" class="screen" hidden aria-labelledby="qr-h">
+  <div class="backbar"><button class="ghost small" data-go="sheet">Back to my investigator</button></div>
+  <h2 id="qr-h" tabindex="-1">Quick rules reminder</h2>
+  <h3>How a roll works</h3>
+  <p>You roll one hundred. Rolling <strong>equal to or under</strong> your skill is a success. The app tells you which level you reached.</p>
+  <ul>
+    <li><strong>Critical:</strong> you rolled 1.</li>
+    <li><strong>Extreme success:</strong> one fifth of your skill or less.</li>
+    <li><strong>Hard success:</strong> half your skill or less.</li>
+    <li><strong>Regular success:</strong> your skill or less.</li>
+    <li><strong>Fail:</strong> over your skill.</li>
+    <li><strong>Fumble:</strong> 100. Also 96 or more if your skill is under 50.</li>
+  </ul>
+  <h3>Pushing a roll</h3>
+  <p>If you fail, you may try once more, but you must say what your investigator does differently. If the pushed roll also fails, the Keeper inflicts a real consequence. You cannot push combat rolls or Sanity rolls.</p>
+  <h3>Bonus and penalty dice</h3>
+  <p>The Keeper may grant a bonus die when conditions favour you, or a penalty die when they work against you. The app rolls the extra dice and takes the right one for you. One bonus and one penalty cancel out.</p>
+  <h3>Wounds</h3>
+  <ul>
+    <li>First Aid heals 1 hit point. Medicine heals 1D3.</li>
+    <li>A <strong>major wound</strong> is losing half your maximum hit points or more from one attack.</li>
+    <li>At 0 hit points without a major wound you are unconscious.</li>
+    <li>At 0 hit points with a major wound you are dying.</li>
+    <li>Damage equal to your maximum hit points in one blow kills you outright.</li>
+  </ul>
+  <h3>Sanity</h3>
+  <p>A loss written as one slash one D eight means: roll under your current Sanity and lose 1, roll over and lose 1D8. Losing 5 or more at once means you roll against INT; passing that roll means you understood what you saw and go temporarily insane for 1D10 hours.</p>
+</section>
+
+<!-- ================= TUTORIAL (PLAYER) ================= -->
+<section id="tutorial" class="screen" hidden aria-labelledby="tut-h">
+  <div class="backbar"><button class="ghost small" id="tut-leave">Leave the tutorial</button></div>
+  <h2 id="tut-h" tabindex="-1">Learn to play</h2>
+  <p class="sub" id="tut-progress"></p>
+  <div id="tut-body"></div>
+  <div id="tut-try"></div>
+  <div class="res" id="res5" role="group" aria-label="Practice result">
+    <p class="verdict" id="res5-v">Nothing yet</p>
+    <p class="detail" id="res5-d">Nothing in this tutorial touches your real investigator.</p>
+  </div>
+  <div class="row">
+    <button id="tut-prev">Previous step</button>
+    <button id="tut-next" class="primary">Next step</button>
+  </div>
+</section>
+
+<!-- ================= TUTORIAL (KEEPER SCRIPT) ================= -->
+<section id="ktutorial" class="screen" hidden aria-labelledby="ktut-h">
+  <div class="backbar"><button class="ghost small" data-go="keeper">Back to Keeper</button></div>
+  <h2 id="ktut-h" tabindex="-1">Teach the game: a script</h2>
+  <p class="sub">About twenty minutes. Your players open <strong>Learn to play</strong> on their own devices and follow the same numbered steps. Say the bold part in your own words, let them do the thing, then move on.</p>
+  <div id="ktut-body"></div>
+</section>
+
+<!-- ================= QUICK REFERENCE ================= -->
+<section id="kquick" class="screen" hidden aria-labelledby="kq-h">
+  <div class="backbar"><button class="ghost small" data-go="keeper">Back to Keeper</button></div>
+  <h2 id="kq-h" tabindex="-1">Quick reference</h2>
+  <p class="sub">Everything you glance at mid-play, on one screen. Print it for behind the screen.</p>
+  <button id="kq-print">Print this sheet</button>
+
+  <h3>Result of a roll</h3>
+  <div class="scroll"><table>
+    <tr><th>Roll</th><th>Result</th></tr>
+    <tr><td>01</td><td>Critical success</td></tr>
+    <tr><td>Fifth of skill or less</td><td>Extreme success</td></tr>
+    <tr><td>Half of skill or less</td><td>Hard success</td></tr>
+    <tr><td>Skill or less</td><td>Regular success</td></tr>
+    <tr><td>Over skill</td><td>Fail</td></tr>
+    <tr><td>100, or 96+ if skill is under 50</td><td>Fumble</td></tr>
+  </table></div>
+
+  <h3>Half and fifth, without the arithmetic</h3>
+  <div class="scroll"><table id="kq-thresholds">
+    <caption class="sr-only">Hard and Extreme targets for common skill values</caption>
+  </table></div>
+
+  <h3>Pushing</h3>
+  <ul>
+    <li>Only after a failure, and only if the player says what they are doing differently.</li>
+    <li>One push per roll. A failed push means a real consequence, not just failure.</li>
+    <li><strong>Never</strong> on combat rolls or Sanity rolls.</li>
+  </ul>
+
+  <h3>Bonus and penalty dice</h3>
+  <ul>
+    <li>Roll an extra tens die. Bonus keeps the lower total, penalty keeps the higher.</li>
+    <li>One bonus and one penalty cancel out.</li>
+    <li>Point-blank firearms, outnumbering, and a held-up trash can lid all grant one.</li>
+  </ul>
+
+  <h3>Opposed rolls</h3>
+  <ul>
+    <li>Extreme beats Hard beats Regular beats Fail.</li>
+    <li>Draw: higher skill value wins. Still tied: both roll 1D100, lower wins.</li>
+    <li>Grabbing the floating knife is the exception — on a draw, whoever's turn it is wins.</li>
+  </ul>
+
+  <h3>A combat round</h3>
+  <ol>
+    <li>DEX order, highest first. Gun already drawn: add 50 to that investigator's DEX.</li>
+    <li>Attacker rolls Fighting or Firearms.</li>
+    <li>Defender chooses <strong>Dodge</strong> (needs to equal or beat the attacker) or <strong>fight back</strong> with Fighting (needs to beat them outright, and deals damage if it works).</li>
+    <li>Fighting back can only ever do regular damage. Only the initiator can do extreme damage.</li>
+    <li>Extreme damage: blunt is max damage + bonus; impaling is max + another damage roll + bonus.</li>
+    <li>Once a character has already responded this round, further melee attacks on them get a bonus die.</li>
+  </ol>
+
+  <h3>Wounds</h3>
+  <ul>
+    <li><strong>Major wound:</strong> half maximum hit points or more, from one hit.</li>
+    <li>0 HP, no major wound: unconscious. 0 HP with one: dying.</li>
+    <li>Damage equal to maximum HP in one blow: dead immediately.</li>
+    <li>First Aid heals 1. Medicine heals 1D3.</li>
+    <li>Healing: 1 HP per day. With a major wound, a weekly CON roll for 1D3, or 2D3 on an Extreme.</li>
+  </ul>
+
+  <h3>Sanity</h3>
+  <ul>
+    <li>Written <strong>X/Y</strong>: roll under current Sanity to lose X, over to lose Y.</li>
+    <li>A failed roll lets you dictate one involuntary action.</li>
+    <li>Losing <strong>5 or more at once</strong>: roll against INT. <em>Passing</em> means temporary insanity for 1D10 hours.</li>
+    <li>Temporary insanity: roll 1D10 for a bout of madness, lasting 1D10 rounds.</li>
+  </ul>
+
+  <h3>Other forms of damage</h3>
+  <div class="scroll"><table>
+    <tr><th>Severity</th><th>Damage</th><th>For example</th></tr>
+    <tr><td>Minor</td><td>1D3</td><td>Punch, kick, thrown rock, 10ft onto soft ground</td></tr>
+    <tr><td>Moderate</td><td>1D6</td><td>Club, drowning, small-calibre bullet, burning torch</td></tr>
+    <tr><td>Severe</td><td>1D10</td><td>.38 bullet, axe, 10ft onto concrete, mild poison</td></tr>
+    <tr><td>Deadly</td><td>2D10</td><td>Car at 30mph, strong poison, grenade at 3–6 yards</td></tr>
+    <tr><td>Terminal</td><td>4D10</td><td>Speeding car, grenade within 3 yards</td></tr>
+    <tr><td>Splat</td><td>8D10</td><td>Head-on collision, hit by a train</td></tr>
+  </table></div>
+
+  <h3>This scenario, every number</h3>
+  <div class="scroll"><table>
+    <tr><th>Thing</th><th>Numbers</th></tr>
+    <tr><td>Chapel floor gives way</td><td>Luck, then Jump. Fall is 1D6</td></tr>
+    <tr><td>Basement stairs</td><td>Combined DEX or Climb. Failed push, fall 1D6</td></tr>
+    <tr><td>The flying bed</td><td>Spot Hidden, then Dodge. Hit is 1D6+2</td></tr>
+    <tr><td>Seeing the bed move</td><td>Sanity 1/1D4</td></tr>
+    <tr><td>Floating knife</td><td>1D4+2, or 6+1D4+2 impaling</td></tr>
+    <tr><td>Grabbing the blade (failed push)</td><td>1D4+2, automatic, no attack roll</td></tr>
+    <tr><td>Seeing the knife attack</td><td>Sanity 1/1D4</td></tr>
+    <tr><td>Seeing Corbitt move</td><td>Sanity 1/1D8</td></tr>
+    <tr><td>Reading the Corbitt diaries</td><td>2 days, +4 Cthulhu Mythos, lose 1D4 Sanity, no roll</td></tr>
+    <tr><td>Reading the Liber Ivonis</td><td>3 hours, +2 Cthulhu Mythos, max Sanity 99 to 97</td></tr>
+    <tr><td>Reward for destroying Corbitt</td><td>1D6 Sanity each, plus fee and $30</td></tr>
+  </table></div>
+
+  <h3>Corbitt at the table</h3>
+  <div class="scroll"><table>
+    <tr><th></th><th></th></tr>
+    <tr><td>Hit points</td><td>16</td></tr>
+    <tr><td>Magic points</td><td>18, recovering 1 per hour</td></tr>
+    <tr><td>Fighting</td><td>50 / hard 25 / extreme 10, damage 1D3 + 1D4</td></tr>
+    <tr><td>Dodge</td><td>17 / hard 8 / extreme 3</td></tr>
+    <tr><td>DEX / POW</td><td>35 (85 when casting Dominate) / 90</td></tr>
+    <tr><td>Flesh Ward</td><td>2D6 armour, already cast, wears off as it blocks</td></tr>
+    <tr><td>Animating himself</td><td>2 magic points for 5 rounds</td></tr>
+    <tr><td>The knife</td><td>1 magic point per round, covering everything it does that round</td></tr>
+    <tr><td>Dominate</td><td>1 magic point, opposed POW vs 90, dazed 1D6+1 rounds</td></tr>
+    <tr><td>Claw infection</td><td>Luck, then CON next day. Fail: 1D10 days, lose 1D10 CON permanently</td></tr>
+  </table></div>
+  <p class="note">The knife rolls against his POW 90: fail on 91+, Regular 46–90, Hard 19–45, Extreme 18 or less.</p>
+
+  <h3>Rat pack, if you want one</h3>
+  <p class="kv">Ten rats. STR 35, CON 55, SIZ 35, POW 50, DEX 70, HP 9, Move 9, Build and damage bonus &minus;1. Fighting 40 / 20 / 8 for 1D3. Dodge 42 / 21 / 8. Overwhelming someone as a pack is a fighting maneuver for 2D6 with a bonus die. One good hit kills a rat or two and scatters the rest.</p>
+</section>
+
+<!-- ================= NPCs ================= -->
+<section id="knpcs" class="screen" hidden aria-labelledby="knpc-h">
+  <div class="backbar"><button class="ghost small" data-go="keeper">Back to Keeper</button></div>
+  <h2 id="knpc-h" tabindex="-1">Playing the people</h2>
+  <p class="sub">Every speaking part in the scenario, with a voice you can actually hold and lines you can say out loud. Each one has a <strong>sounds like</strong> marker: keep it consistent and your wife can tell them apart without seeing your face.</p>
+  <div id="knpc-body"></div>
+</section>
+
+<!-- ================= RUN THE SESSION ================= -->
+<section id="krun" class="screen" hidden aria-labelledby="krun-h">
+  <div class="backbar"><button class="ghost small" data-go="keeper">Back to Keeper</button></div>
+  <h2 id="krun-h" tabindex="-1">Run the session</h2>
+  <p class="sub" id="krun-progress"></p>
+  <label for="krun-jump">Jump to a scene</label>
+  <select id="krun-jump"></select>
+  <div id="krun-body"></div>
+  <div class="row">
+    <button id="krun-prev">Previous scene</button>
+    <button id="krun-next" class="primary">Next scene</button>
+  </div>
+  <hr>
+  <button data-go="krunstate">Session progress and handouts</button>
+</section>
+
+<!-- ================= SESSION PROGRESS ================= -->
+<section id="krunstate" class="screen" hidden aria-labelledby="krs-h">
+  <div class="backbar"><button class="ghost small" data-go="krun">Back to the scene</button></div>
+  <h2 id="krs-h" tabindex="-1">Session progress</h2>
+  <div id="krs-body"></div>
+  <hr>
+  <button class="ghost" id="krun-reset">Start a fresh session</button>
+</section>
+
+<!-- ================= HANDOUTS ================= -->
+<section id="handouts" class="screen" hidden aria-labelledby="ho-h">
+  <div class="backbar"><button class="ghost small" id="ho-back">Back</button></div>
+  <h2 id="ho-h" tabindex="-1">Handouts</h2>
+  <p class="sub">Read these only when the Keeper hands them to you.</p>
+  <div id="ho-body"></div>
+</section>
+
+<!-- ================= KEEPER HUB ================= -->
+<section id="keeper" class="screen" hidden aria-labelledby="keeper-h">
+  <div class="backbar"><button class="ghost small" data-go="home">Back to start</button></div>
+  <h2 id="keeper-h" tabindex="-1">Keeper</h2>
+  <p class="sub">Everything condensed from the Quick-Start rules and <em>The Haunting</em>.</p>
+  <button class="primary" data-go="ktutorial">Teach the game: a script</button>
+  <button class="primary" data-go="krun">Run the session</button>
+  <button class="primary" data-go="kquick">Quick reference</button>
+  <button data-go="krules">The rules, condensed</button>
+  <button data-go="krunsheet">The Haunting: scene by scene</button>
+  <button data-go="knpcs">Playing the people</button>
+  <button data-go="kcorbitt">Walter Corbitt and the knife</button>
+  <button data-go="kmadness">Bouts of madness</button>
+  <button data-go="handouts">Handouts</button>
+  <button data-go="kpregens">The four investigators</button>
+  <button data-go="ktips">Running it for a blind player</button>
+</section>
+
+<!-- ================= KEEPER RULES ================= -->
+<section id="krules" class="screen" hidden aria-labelledby="kr-h">
+  <div class="backbar"><button class="ghost small" data-go="keeper">Back to Keeper</button></div>
+  <h2 id="kr-h" tabindex="-1">The rules, condensed</h2>
+
+  <h3>The whole system in six lines</h3>
+  <ol>
+    <li>Call for a roll only when the outcome is <em>uncertain and dramatic</em>.</li>
+    <li>Agree the goal first. Success means the goal is achieved.</li>
+    <li>Roll 1D100. Equal to or under the skill is a Regular success; under half is Hard; under one fifth is Extreme.</li>
+    <li>1 is a critical. 100 is a fumble, as is 96+ when the skill is under 50.</li>
+    <li>A failed roll can be pushed once, if the player justifies it. A failed push costs them something real.</li>
+    <li>On a success, the player ticks that skill for possible improvement later.</li>
+  </ol>
+
+  <h3>Difficulty</h3>
+  <p>You set difficulty by declaring which level is needed <em>before</em> the roll: Regular for ordinary tasks, Hard for difficult ones, Extreme for the limits of human capability. A useful yardstick from the text: if the task needs a professional level of skill, ask for Hard.</p>
+
+  <h3>Opposed rolls</h3>
+  <p>Both sides roll. Extreme beats Hard beats Regular beats Fail. On a draw, the higher skill value wins; if those are also equal, both roll 1D100 and the lower wins.</p>
+
+  <h3>Bonus and penalty dice</h3>
+  <p>Roll an extra tens die. For a bonus, keep the better (lower) result; for a penalty, keep the worse (higher). One of each cancels out. Mostly used for opposed rolls.</p>
+
+  <h3>Luck</h3>
+  <p>Use Luck when the question is about circumstance rather than ability: is there a loose plank to hand, does the torch still work, is a cab passing. For a group Luck roll, the lowest Luck present rolls for everyone.</p>
+
+  <h3>Sanity</h3>
+  <ul>
+    <li>Loss is written <strong>X/Y</strong>. Roll equal to or under current Sanity to lose X; over to lose Y.</li>
+    <li>Failing a Sanity roll lets you dictate one involuntary action: a scream, a freeze, a dropped weapon.</li>
+    <li>Losing <strong>5 or more at once</strong> means major emotional trauma. The player rolls 1D100 against INT. <em>Passing</em> means they comprehended it and go temporarily insane for 1D10 hours; failing means their mind closed to it and they stay sane.</li>
+    <li>Temporary insanity means a bout of madness, and you may add a phobia or mania, or corrupt a backstory entry.</li>
+    <li>During insanity you may present delusions. A player can ask for a "reality check" — a Sanity roll — to see through one. Failing sinks them deeper.</li>
+  </ul>
+
+  <h3>Combat sequence</h3>
+  <ol>
+    <li>Everyone acts in DEX order, highest first. A gun already drawn adds 50 to that investigator's DEX.</li>
+    <li>A round is "long enough for everyone to take one significant action".</li>
+    <li>An attacker rolls Fighting or Firearms. The defender chooses to <strong>dodge</strong> (Dodge skill: they need to equal or beat the attacker's level) or <strong>fight back</strong> (Fighting skill: they need to beat it).</li>
+    <li>The winner takes no damage and deals damage. Fighting back can only ever achieve regular damage; only the initiator can deal extreme damage.</li>
+    <li>Extreme damage from a blunt weapon is maximum damage plus damage bonus. From an impaling weapon it is maximum damage, plus another damage roll, plus damage bonus.</li>
+    <li>Combat rolls cannot be pushed.</li>
+  </ol>
+
+  <h4>Fighting maneuvers</h4>
+  <p>Disarm, knock down, or seize. Treated as a normal Fighting attack. Compare Build: the initiator takes one penalty die per point of Build deficit, to a maximum of two. If the opponent's Build exceeds theirs by three or more, the maneuver simply cannot work.</p>
+
+  <h4>Outnumbered</h4>
+  <p>Once a character has already responded to an attack this round, every further melee attack on them that round gets one bonus die. Firearms do not benefit.</p>
+
+  <h3>Wounds and healing</h3>
+  <ul>
+    <li>First Aid heals 1 hit point; Medicine heals 1D3.</li>
+    <li><strong>Major wound:</strong> losing half or more of maximum hit points from a single blow.</li>
+    <li>0 hit points without a major wound: unconscious. With one: dying.</li>
+    <li>Damage equal to or greater than maximum hit points in one blow: instant death.</li>
+    <li>Healing without a major wound: 1 hit point per day.</li>
+    <li>With a major wound: a CON roll at the end of each week. Success heals 1D3, an Extreme success heals 2D3. The major wound clears on an Extreme success, or once hit points reach half maximum.</li>
+  </ul>
+
+  <h3>Other forms of damage</h3>
+  <div class="scroll"><table>
+    <caption class="sr-only">Damage by severity of injury</caption>
+    <tr><th>Severity</th><th>Damage</th><th>Examples</th></tr>
+    <tr><td>Minor</td><td>1D3</td><td>Punch, kick, head-butt, thrown rock, a 10-foot fall onto soft ground</td></tr>
+    <tr><td>Moderate</td><td>1D6</td><td>Club, strong acid, drowning, small-calibre bullet, arrow, burning torch</td></tr>
+    <tr><td>Severe</td><td>1D10</td><td>.38 bullet, axe, 10-foot fall onto concrete, flamethrower, mild poison</td></tr>
+    <tr><td>Deadly</td><td>2D10</td><td>Hit by a car at 30 mph, strong poison, grenade at 3 to 6 yards</td></tr>
+    <tr><td>Terminal</td><td>4D10</td><td>Hit by a speeding car, grenade within 3 yards, lethal poison</td></tr>
+    <tr><td>Splat</td><td>8D10</td><td>High-speed head-on collision, hit by a train</td></tr>
+  </table></div>
+</section>
+
+<!-- ================= RUNSHEET ================= -->
+<section id="krunsheet" class="screen" hidden aria-labelledby="rs-h">
+  <div class="backbar"><button class="ghost small" data-go="keeper">Back to Keeper</button></div>
+  <h2 id="rs-h" tabindex="-1">The Haunting: scene by scene</h2>
+
+  <h3>Opening</h3>
+  <p>Each player takes one investigator and names them. The premise: they are hired to investigate an old house in 1920s Boston that may be haunted. Read <strong>Handout 1</strong>.</p>
+  <p class="note">Mr. Steven Knott recently inherited the property. He wants to rent or sell it, and cannot, because of its reputation. He pays $20 a day and hands over the keys, the address, and $20 in advance.</p>
+  <p>Players will often want to go straight to the house. Steer them toward research first.</p>
+
+  <h3>Location 2 — The Boston Globe</h3>
+  <p>Mention the "morgue", the clippings files in the basement. Access is gated by <strong>Arty Wilmot</strong>, a pompous editor who starts out unhelpful. Goal: gain access to the clippings files.</p>
+  <ul>
+    <li>Friendly approach: <strong>Charm</strong>. Aggressive: <strong>Intimidate</strong>. Reasoned: <strong>Persuade</strong>. Conning him: <strong>Fast Talk</strong>.</li>
+    <li>Regular difficulty — Arty is not a professional-grade social operator.</li>
+    <li>Success: he backs down. Failure: he puffs up and throws them out.</li>
+    <li>They may push by pressing him, and may switch approach. A failed push must escalate beyond "leave" — he calls maintenance men, or it comes to blows.</li>
+  </ul>
+  <p>Inside, give <strong>Handout 2</strong> freely — they already paid for it with the social roll. Ruth Blake, the records keeper, will mention the files go back no further than an 1878 fire.</p>
+
+  <h3>Location 3 — The Central Library</h3>
+  <p>One <strong>Library Use</strong> roll per half-day of research, per player. No pushing needed: they can simply keep trying, but each attempt costs another half-day. Each success yields the next handout in order: <strong>3, 4, 5, 6</strong>. After more than a day, have Knott chase them for progress.</p>
+
+  <h3>Location 4 — The Hall of Records</h3>
+  <p><strong>Library Use</strong> to earn <strong>Handout 7</strong>, same half-day rule. If they look up the Chapel of Contemplation, the 1912 records are referenced but missing. A successful <strong>Law</strong> roll, or simple courtesy toward the clerk, points them to the Central Police Station.</p>
+
+  <h3>Location 5 — Higher Courts and Central Police Station</h3>
+  <p>Needs one successful roll for <strong>Handout 8</strong>. Any of:</p>
+  <ul>
+    <li><strong>Law</strong> — they know Kim Debrun, a court clerk. Roll <em>concealed</em> and do not reveal the result. On a success Kim is warm and helpful; on a failure Kim demands a bribe, then reneges and denies knowing them.</li>
+    <li><strong>Credit Rating</strong> — works on a success only if their Credit Rating is 75 or more.</li>
+    <li><strong>Persuade</strong>, <strong>Charm</strong> (a flutter of eyelids), or <strong>Fast Talk</strong> (a fake ID — risky here).</li>
+  </ul>
+  <p>A failed push with Credit Rating, Persuade or Charm earns police antipathy: a shakedown or threats.</p>
+
+  <h3>Location 6 — The Neighborhood</h3>
+  <p>The Corbitt House is now the only private residence on the block. <strong>Mr. Dooley</strong>, a cigar and newspaper vendor, knows the area. Roll 1D100 against the investigator's <strong>APP or Credit Rating</strong> for his reaction; on a poor reaction another investigator may try Charm, Fast Talk, Persuade or Intimidate.</p>
+  <p>What Dooley gives up:</p>
+  <ul>
+    <li>The Macario family moved in a couple of years ago.</li>
+    <li>A year later the father had a serious accident, then went violently mad.</li>
+    <li>He babbled about a haunting form with burning eyes.</li>
+    <li>About a month ago Mrs. Macario went mad too.</li>
+    <li>Both are at Roxbury Sanitarium, a few miles out.</li>
+    <li>The children went to relatives in Baltimore.</li>
+  </ul>
+  <p>He can also point out where the Chapel of Contemplation stood, a few blocks away, and calls the house "the Corbitt House".</p>
+
+  <h3>Location 7 — Roxbury Sanitarium</h3>
+  <p><strong>Vittorio Macario</strong> is quite mad, clutching a bible. At some point he opens it at random, points, and "quotes": <em>"By his own weapon is the devil worsted!"</em> It is not a real verse. It is the clue that Corbitt can be killed with his own dagger. Do not oversell it.</p>
+  <p><strong>Gabriela Macario</strong> is lucid. An evil presence lives in the house. She would wake to find it leaning over her. When angry it threw dishes and objects around the room. Above all it hated Vittorio. End the interview quickly — the questions distress her.</p>
+  <p>The two boys in Baltimore know nothing except that they miss their parents and had nightmares of a strange man with burning eyes.</p>
+
+  <h3>Location 8 — The Chapel of Contemplation</h3>
+  <p>Ruins at the end of a crooked street. On a slumping wall, freshly painted in white: three Y shapes arranged in a triangle, their tops touching, with a staring eye at the centre. That is <strong>Handout 9</strong>.</p>
+  <p>Near the symbol, describe a tingling in their foreheads, like a headache but not quite. It stops when they leave.</p>
+  <ul>
+    <li>As they prowl the rubble, the earth is covering weakened floorboards. Call for <strong>Luck</strong> rolls.</li>
+    <li>Anyone who fails Luck must make a <strong>Jump</strong> roll to reach safety.</li>
+    <li>Failing Jump means a ten-foot fall into the basement for <strong>1D6</strong> hit points. They may push Jump with a last-minute grab for the edge; a failed push might break a treasured possession rather than simply hurting more.</li>
+  </ul>
+  <p>In the sealed basement: two skeletons in tattered silk robes beside a cabinet, holding mouldering church records. Under the cabinet, on a <strong>Spot Hidden</strong> roll (pushable with a thorough search):</p>
+  <ul>
+    <li>A journal recording that Walter Corbitt was buried in the basement of his house, "in accordance with his wishes and with the wishes of that one who waits in the dark".</li>
+    <li>A huge worm-eaten Latin volume: the <strong>Liber Ivonis</strong>. Reading it needs Language (Other) Latin at 50%+ or a successful roll, and three hours. It grants +2 Cthulhu Mythos and drops maximum Sanity from 99 to 97.</li>
+  </ul>
+
+  <h3>Location 9 — The Old Corbitt Place</h3>
+  <p>Brick, overshadowed by taller office buildings, set back in shadow with blank curtained windows. The front door has one lock plus four bolts added in the last year or two. Every ground-floor window is nailed shut from the inside.</p>
+
+  <h4>Ground floor</h4>
+  <ul>
+    <li><strong>1 — Storage.</strong> Boxes and junk; a cupboard boarded shut. Forced open, it holds <strong>three Corbitt diaries</strong> in English: two days to read, +4 Cthulhu Mythos, lose 1D4 Sanity. They describe Corbitt's experiments and the spell "Call Forth the Opener of Ways" (Summon/Bind Dimensional Shambler), which takes 2D6 weeks to learn and is not meant to be used in this scenario.</li>
+    <li><strong>2 — Second storage.</strong> Old furniture, fit for firewood.</li>
+    <li><strong>3 — Mud room.</strong> Coats, galoshes, umbrellas, coal. The side door has three bolts and two locks.</li>
+    <li><strong>4 — Living room.</strong> Radio, couch, shelves — and an unusual quantity of crosses, images of the Virgin, and other Catholic artifacts.</li>
+    <li><strong>5 — Dining room.</strong> Mahogany table, seven chairs, three places set and unused, rice soup rotting in a tureen.</li>
+    <li><strong>6 — Kitchen.</strong> Icebox, wood stove, meagre larder, rat spoor. The fuse box is here.</li>
+  </ul>
+  <p class="note">Build the creep steadily. Corbitt haunts the place: at any moment a noise may come from the spare bedroom upstairs.</p>
+
+  <h4>Upper floor</h4>
+  <ul>
+    <li><strong>1 — Main bedroom.</strong> Vittorio and Gabriela's. More crosses, many candles, a rosary and breviary by the bed.</li>
+    <li><strong>2 — Children's bedroom.</strong> Two small beds, toys, pictures of aircraft and cowboys.</li>
+    <li><strong>3 — Spare bedroom.</strong> Bed frame, bare springs, a dresser. <strong>This was Corbitt's own room.</strong> His influence lingers and he can will things to happen here. Whenever he does, a horrible smell manifests — a sure sign of the Mythos.</li>
+  </ul>
+  <p>What Corbitt can do in that room: loud thumping audible anywhere in the house; pools of blood forming on the floor or dripping from the ceiling; rattling and scratching at the windowpane or door; and the bed attack.</p>
+  <p><strong>The bed attack.</strong> He lures them to inspect the window, then hurls the bed across the room. Ask the investigator at the window for <strong>Spot Hidden</strong>; on a success they may <strong>Dodge</strong>. A hit throws them through the window for <strong>1D6+2</strong> hit points. Anyone who sees the bed move makes a Sanity roll at <strong>1/1D4</strong>. Pick the target impartially — lowest Luck, or roll at random among those by the window. This can deliver a major wound; if an investigator dies, bring in Mr. Knott the landlord for that player.</p>
+
+  <h4>The basement</h4>
+  <p>The door has a lock and three bolts, openable only from the upstairs side. Corbitt has cut the power at the kitchen fuse box, and can cut it again whenever it suits him. The walls are lined with close-fitted boards; a cursory inspection reveals hollow areas behind them.</p>
+  <p><strong>The stairs</strong> are in poor repair, and Corbitt can make them move. Each investigator descending makes a <strong>combined DEX or Climb</strong> roll — one roll, compared against both values, either one succeeding. On a failure, tell them going further risks injury: they can stop, or push and risk a fall of <strong>1D6</strong> hit points.</p>
+  <p class="note">If one investigator who made it offers to help another, grant the second a bonus die — but on a failure, both fall and take damage. Shared risk, better odds, real tension.</p>
+  <ul>
+    <li><strong>1 — Storage.</strong> Tools, pipe, a trash can lid, lumber, nails. A <strong>Spot Hidden</strong> here is an obscure clue: on a success they find <strong>the floating knife</strong> and may pick it up, whereupon it fights to break free. A failed <em>pushed</em> Spot Hidden means a hand catches the blade for an automatic <strong>1D4+2</strong> — no attack roll needed.</li>
+    <li><strong>2 — Empty coal bin.</strong> The outside chute is nailed shut.</li>
+    <li><strong>3 — Corbitt's hidden lair.</strong> Behind the boards, a crawl space. Carved into the inner wall: "Chapel of Contemplation", in irregular scratchy letters. Treat as an obvious clue; do not ask for a roll.</li>
+    <li><strong>4 — Corbitt's hiding place.</strong> See the Corbitt screen.</li>
+  </ul>
+
+  <h3>Endings</h3>
+  <ul>
+    <li>If Corbitt is destroyed, each participating investigator gains <strong>1D6 Sanity</strong>.</li>
+    <li>They may claim the worm-eaten book.</li>
+    <li>Knott pays their fee plus a <strong>$30</strong> bonus.</li>
+    <li>If it goes badly: the dead may be reanimated to repair the basement walls before crumbling to dust; the insane flee screaming into the night.</li>
+    <li>If they win, you may ignore the lingering effects of Corbitt's claw attacks.</li>
+    <li>Destroying the house without confronting Corbitt is a valid ending — they may be arrested for arson and have to prove their innocence.</li>
+  </ul>
+</section>
+
+<!-- ================= CORBITT ================= -->
+<section id="kcorbitt" class="screen" hidden aria-labelledby="kc-h">
+  <div class="backbar"><button class="ghost small" data-go="keeper">Back to Keeper</button></div>
+  <h2 id="kc-h" tabindex="-1">Walter Corbitt and the knife</h2>
+
+  <h3>The floating knife</h3>
+  <p>An old knife with an ornate hilt, its blade coated in thick rust that is dried blood. If they find it, Corbitt attacks with it. If they do not, he uses it the moment they start tearing down the wall that hides his body.</p>
+  <ul>
+    <li>Costs Corbitt <strong>1 Magic point per round</strong>. One attack per round.</li>
+    <li>Roll 1D100 against Corbitt's <strong>POW 90</strong>; the investigator rolls <strong>Dodge</strong>. Compare levels.</li>
+    <li>Corbitt fails on 91+. Regular is 46–90, Hard is 19–45, Extreme is 18 or below.</li>
+    <li>A hit deals <strong>1D4+2</strong>. An Extreme success impales for <strong>6+1D4+2</strong>.</li>
+    <li>If the investigator has not noticed the knife, give the attack a bonus die, allow no Dodge, and let it miss only on a fumble of 100. A Spot Hidden roll is what notices it rising.</li>
+    <li>Seeing the knife attack: Sanity roll at <strong>1/1D4</strong>.</li>
+    <li>A garbage can lid held up for protection grants a bonus die on Dodge.</li>
+    <li><strong>Holding the knife:</strong> Corbitt may wrench it back each round at the cost of another Magic point. The player keeps hold by winning an opposed roll of their <strong>STR</strong> against Corbitt's <strong>POW</strong>.</li>
+  </ul>
+  <p class="note">When the knife rises, start combat rounds. Corbitt's DEX is low, so investigators usually act first. If they flee, it attacks whoever is last to the stairs.</p>
+
+  <h3>Corbitt himself</h3>
+  <p>Lying motionless on a pallet: a drawn, wooden-looking, wizened figure of some six feet. Skinny and naked, wide-flaring saucer-like eyes, a nose like a knife blade, a chain about his neck. Hairless, shrunken gums making the teeth look very long. A sharp sweet churning scent, like rotten corn.</p>
+  <p>Spending <strong>2 Magic points</strong> lets him move for five combat rounds. He is reluctant to move at all unless threatened.</p>
+  <p><strong>When he rises: Sanity roll 1/1D8.</strong> Anyone who fails makes one involuntary action of your choosing. Anyone losing 5 or more rolls against INT; passing means temporary insanity.</p>
+
+  <h4>Statistics</h4>
+  <p><strong>Walter Corbitt, Undead Fiend.</strong> STR 90, CON 115, SIZ 55, INT 80, POW 90, DEX 35, APP 05, EDU 80. SAN 0 — he ignores the Sanity cost of his spells.</p>
+  <ul>
+    <li><strong>Hit points 16.</strong> At 0 he crumbles to dust.</li>
+    <li><strong>Magic points 18</strong>, recovering 1 per hour. Track these; the scenario turns on them.</li>
+    <li>Damage bonus +1D4. Build 1. Move 8.</li>
+    <li><strong>Fighting</strong> 50% (Hard 25, Extreme 10), damage 1D3 + 1D4 damage bonus, plus possible infection.</li>
+    <li><strong>Dodge</strong> 17% (Hard 8, Extreme 3).</li>
+    <li><strong>DEX</strong> 35. <strong>POW</strong> 90.</li>
+    <li>Skills: Cthulhu Mythos 17, Intimidate 64, Listen 60, Sleight of Hand 30, Stealth 72. Improvise any others.</li>
+    <li><strong>Armor:</strong> Flesh Ward is already cast. Roll 2D6 for its value. Each point of damage reduces it by one.</li>
+    <li>Attacks per round: 1. Spending a Magic point to send the dagger counts as his action for that round.</li>
+  </ul>
+
+  <h4>Claw infection</h4>
+  <p>If he lands a successful attack, the investigator makes a <strong>Luck</strong> roll. On a failure they are raked by his fingernails: a day later they become delirious and must make a <strong>CON</strong> roll.</p>
+  <ul>
+    <li>Failure: delirium for 1D10 days, and lose 1D10 CON.</li>
+    <li>Success: delirium for 1D6 days, no further loss.</li>
+    <li>Repeat until they recover or die. <strong>Lost CON never returns.</strong></li>
+  </ul>
+
+  <h4>Spells</h4>
+  <p><strong>Dominate (Corbitt's variant)</strong> — 1 Magic point, one round to cast. Works only on a target inside the house. Opposed POW roll against his POW 90. On his success the victim is dazed for 1D6+1 rounds and obeys telepathic commands: hallucinations, or reckless, idiotic or homicidal acts, though never suicidal ones. They remember nothing afterward.</p>
+  <p><strong>Flesh Ward</strong> — variable Magic points, five rounds to cast, already in effect when they arrive. Each point spent gives 1D6 armor against non-magical attacks. It wears off as it blocks damage and cannot be reinforced or recast until used up. Lasts 24 hours.</p>
+  <p><strong>Summon/Bind Dimensional Shambler</strong> — listed, not used here.</p>
+
+  <h4>Combat order</h4>
+  <ul>
+    <li>List investigators and Corbitt by DEX, highest first. A gun already drawn adds 50 to that investigator's DEX.</li>
+    <li>Corbitt acts on DEX 35, or DEX+50 in a round where he casts Dominate.</li>
+    <li>Attacked with Fighting, he fights back with his Fighting skill — including against later attacks in the same round.</li>
+    <li>Attacked with Firearms, just roll to hit; he never dives for cover. Point-blank range grants a bonus die.</li>
+    <li>The second investigator to attack him gets a bonus die for outnumbering.</li>
+  </ul>
+
+  <h4>Playing him</h4>
+  <ul>
+    <li>He is full of malice and will try to <strong>divide the investigators and turn them against each other</strong>.</li>
+    <li>He seeks perverse amusement at their expense.</li>
+    <li>He wants any Mythos knowledge they carry into the house — the Liber Ivonis especially.</li>
+    <li>He does not breathe. Have him growl, screech, cackle or mock rather than speak plainly.</li>
+  </ul>
+
+  <h4>Reality checks</h4>
+  <p>If a player questions a delusion, offer a reality check: a <strong>Sanity roll</strong>. Success drops the delusions and you present no more. Failure costs 1 Sanity, triggers another bout of madness, and you escalate. Because the insanity here comes from a Mythos manifestation, add <strong>5% Cthulhu Mythos</strong> to that investigator.</p>
+
+  <h4>Killing him</h4>
+  <ul>
+    <li>Reaching 0 hit points, he crumbles into dust and never returns.</li>
+    <li>If they wrest his own dagger away and stab him with it, he turns to ash at once, regardless of any spell.</li>
+    <li>He never heals and cannot be knocked unconscious. He does not breathe. Sunlight pains him and may or may not kill him — your call.</li>
+    <li><strong>Track his Magic points carefully.</strong> He recovers 1 per hour. He casts Flesh Ward as soon as anyone enters, so investigators who run straight for his body may catch him before he has regained those two points.</li>
+  </ul>
+</section>
+
+<!-- ================= MADNESS ================= -->
+<section id="kmadness" class="screen" hidden aria-labelledby="km-h">
+  <div class="backbar"><button class="ghost small" data-go="keeper">Back to Keeper</button></div>
+  <h2 id="km-h" tabindex="-1">Bouts of madness</h2>
+  <p class="sub">Choose one, or roll 1D10. Each lasts 1D10 rounds.</p>
+  <button class="primary" id="btn-madness">Roll 1D10 for a bout of madness</button>
+  <div class="res" id="res4" role="group" aria-label="Bout of madness result">
+    <p class="verdict" id="res4-v">Not rolled</p>
+    <p class="detail" id="res4-d">Tap the button above, or read the list.</p>
+  </div>
+  <ol>
+    <li><strong>Amnesia.</strong> No memory of anything since they were last somewhere safe. One moment breakfast, the next a monster.</li>
+    <li><strong>Psychosomatic disability.</strong> Blindness, deafness, or loss of the use of a limb.</li>
+    <li><strong>Violence.</strong> A red mist; uncontrolled violence against surroundings, allies and foes alike.</li>
+    <li><strong>Paranoia.</strong> Everyone is out to get them. No one can be trusted. They are being spied on.</li>
+    <li><strong>Significant person.</strong> They mistake someone in the scene for a person from their backstory, and act on that relationship.</li>
+    <li><strong>Faint.</strong> They pass out.</li>
+    <li><strong>Flee in panic.</strong> Compelled to get as far away as possible by any means, even taking the only vehicle.</li>
+    <li><strong>Physical hysterics or emotional outburst.</strong> Incapacitated: laughing, crying, screaming.</li>
+    <li><strong>Phobia.</strong> A new phobia, such as fear of confined spaces, of spirits, or of cockroaches. They imagine the source is present even when it is not.</li>
+    <li><strong>Mania.</strong> A new mania — compulsive washing, compulsive lying, an excessive liking for worms — which they seek to indulge.</li>
+  </ol>
+  <h3>In this scenario</h3>
+  <p>Corbitt rising is realistically the only thing that can cause insanity here, so the scope for delusions is limited. Insanity lasts 1D10 hours, or until they leave the house and get a good night's rest. Add a fitting entry to their backstory. One suggested delusion: a fleeing investigator finds a photograph that seems to show Corbitt with their own grandfather, naming them as kin.</p>
+</section>
+
+<!-- ================= PREGENS ================= -->
+<section id="kpregens" class="screen" hidden aria-labelledby="kp-h">
+  <div class="backbar"><button class="ghost small" data-go="keeper">Back to Keeper</button></div>
+  <h2 id="kp-h" tabindex="-1">The four investigators</h2>
+  <p class="sub">The same four ready-made investigators the players choose from.</p>
+  <div id="kp-body"></div>
+</section>
+
+<!-- ================= TIPS ================= -->
+<section id="ktips" class="screen" hidden aria-labelledby="kt-h">
+  <div class="backbar"><button class="ghost small" data-go="keeper">Back to Keeper</button></div>
+  <h2 id="kt-h" tabindex="-1">Running it for a blind player</h2>
+  <h3>Four habits that do most of the work</h3>
+  <ul>
+    <li><strong>Say the target number before anyone rolls.</strong> "Give me a Spot Hidden, Regular." It costs nothing, keeps you honest, and means she never has to ask.</li>
+    <li><strong>Describe rooms in a fixed order.</strong> Pick one — exits, then furniture, then detail — and never vary it. Predictable structure is navigable structure.</li>
+    <li><strong>Name the person before the question.</strong> "Martha, what are you doing?" not "What are you doing?" She always knows when a question is hers.</li>
+    <li><strong>Say who is speaking</strong> when you switch NPCs. Sighted players read it off your face; she cannot.</li>
+  </ul>
+  <h3>Things in this scenario that need care</h3>
+  <ul>
+    <li><strong>Handout 9 is a picture.</strong> It is on the Handouts screen as a description she can read. Do not just slide a page across the table.</li>
+    <li><strong>The house map.</strong> Describing the layout room by room as they move works better than any map. The room lists on the runsheet screen are already in walking order.</li>
+    <li><strong>The bed attack</strong> depends on who is standing where. State positions out loud before you spring it, so the choice feels fair rather than arbitrary.</li>
+    <li><strong>Combat positions.</strong> Say where everyone is at the top of each round. Two sentences, every round.</li>
+  </ul>
+  <h3>Before session one</h3>
+  <p>Run a twenty-minute taster: one skill roll, one pushed roll, one Sanity roll, one combat round. That is genuinely the whole game, and it gets everyone used to the app and to the table conventions before anything is at stake.</p>
+</section>
+
+</div><!-- /wrap -->
+
+<script>
+"use strict";
+
+/* ---------------- data ---------------- */
+
+const SKILL_BASE = {
+  "Accounting":5,"Anthropology":1,"Appraise":5,"Archaeology":1,"Charm":15,"Climb":20,
+  "Credit Rating":0,"Cthulhu Mythos":0,"Disguise":5,"Drive Auto":20,"Electrical Repair":10,
+  "Fast Talk":5,"Fighting (Brawl)":25,"Firearms (Handgun)":20,"Firearms (Rifle/Shotgun)":25,
+  "First Aid":30,"History":5,"Intimidate":15,"Jump":20,"Law":5,"Library Use":20,"Listen":20,
+  "Locksmith":1,"Mechanical Repair":10,"Medicine":1,"Natural World":10,"Navigate":10,
+  "Occult":5,"Persuade":10,"Pilot":1,"Psychoanalysis":1,"Psychology":10,"Ride":5,"Science":1,
+  "Sleight of Hand":10,"Spot Hidden":25,"Stealth":20,"Survival":10,"Swim":20,"Throw":20,"Track":10
+};
+
+const CHAR_NAMES = {STR:"Strength",CON:"Constitution",DEX:"Dexterity",INT:"Intelligence",
+  SIZ:"Size",POW:"Power",APP:"Appearance",EDU:"Education"};
+
+const INVESTIGATORS = [
+  {
+    id:"pi", occupation:"Private Investigator", blurb:"A weary private detective",
+    residence:"Boston", age:36,
+    chars:{STR:80,CON:70,DEX:70,INT:50,SIZ:50,POW:60,APP:50,EDU:40},
+    hp:12, mp:12, luck:50, san:60, move:9, build:1, db:"1D4",
+    skills:{"Art/Craft (Photography)":60,"Credit Rating":20,"Disguise":60,"Dodge":30,
+      "Fast Talk":60,"Fighting (Brawl)":70,"Firearms (Handgun)":40,"Intimidate":35,
+      "Language (Own) English":40,"Law":40,"Library Use":50,"Listen":40,
+      "Mechanical Repair":30,"Psychology":60,"Spot Hidden":50,"Stealth":40},
+    weapons:[
+      {name:"Brawl",skill:70,dmg:"1D3",db:true,notes:"1 attack per round"},
+      {name:".38 Revolver",skill:40,dmg:"1D10",db:false,notes:"1 attack, 15 yards, 6 shots, malfunction 100"}
+    ],
+    description:"Untidy and rough around the edges, a world-weary look and tired eyes.",
+    traits:"Cautious.",
+    ideology:"Ghosts and phantoms aren't real, they are just stories made up to scare kids. Everyone lies.",
+    people:"", locations:"Home, where peace and rest can be found.",
+    treasured:"Luck charm key ring.",
+    gear:["Note pad and fountain pen","A .38 revolver and bullets","Small ball of twine","Cigarette lighter","Pack of cigarettes","Luck charm key ring"],
+    spending:"$10 on hand", cash:"$40 available in a hurry"
+  },
+  {
+    id:"grad", occupation:"Graduate Student", blurb:"An enthusiastic graduate student",
+    residence:"Boston", age:24,
+    chars:{STR:60,CON:50,DEX:40,INT:80,SIZ:50,POW:50,APP:60,EDU:70},
+    hp:10, mp:10, luck:60, san:50, move:8, build:0, db:"",
+    skills:{"Archaeology":50,"Climb":30,"Credit Rating":25,"Dodge":40,"Fighting (Brawl)":45,
+      "History":60,"Language (Other) Latin":40,"Language (Own) English":70,"Library Use":60,
+      "Listen":70,"Persuade":50,"Spot Hidden":45,"Throw":40},
+    weapons:[{name:"Brawl",skill:45,dmg:"1D3",db:false,notes:"1 attack per round"}],
+    description:"Bookish, in smart but inexpensive clothing.",
+    traits:"Loyal, with a thirst for knowledge.",
+    ideology:"Most times, science and logic can explain everything.",
+    people:"Father, who went missing during an expedition to South America.",
+    locations:"", treasured:"Father's old fountain pen, which they always carry.",
+    gear:["Note pad","Father's old fountain pen"],
+    spending:"$10 on hand", cash:"$50 available in a hurry"
+  },
+  {
+    id:"prof", occupation:"University Professor", blurb:"An open-minded academic",
+    residence:"Boston", age:43,
+    chars:{STR:40,CON:70,DEX:60,INT:60,SIZ:50,POW:50,APP:50,EDU:80},
+    hp:12, mp:10, luck:50, san:50, move:7, build:0, db:"",
+    skills:{"Archaeology":40,"Charm":35,"Credit Rating":30,"Dodge":30,"First Aid":50,
+      "History":50,"Language (Other) Latin":50,"Language (Own) English":80,"Library Use":70,
+      "Listen":40,"Natural World":20,"Occult":50,"Persuade":30,"Psychology":60,"Spot Hidden":60},
+    weapons:[{name:"Brawl",skill:25,dmg:"1D3",db:false,notes:"Untrained, at the base 25 percent"}],
+    description:"Stuffy, with spectacles, wearing dishevelled clothing.",
+    traits:"Inquiring mind, eager to find answers.",
+    ideology:"The unseen world is all around us and we must open our minds to see its hidden secrets. Unseen forces work to affect us.",
+    people:"Partner and young daughter.",
+    locations:"Libraries, where one can get lost in books and the worlds they reveal.",
+    treasured:"An old hip flask, filled with whiskey.",
+    gear:["Notebook and fountain pen","Two pencils","Hip flask","Metal hair comb"],
+    spending:"$10 on hand", cash:"$60 available in a hurry"
+  },
+  {
+    id:"author", occupation:"Author and Researcher", blurb:"An author with an interest in the occult",
+    residence:"Boston", age:38,
+    chars:{STR:50,CON:50,DEX:80,INT:60,SIZ:70,POW:50,APP:40,EDU:60},
+    hp:12, mp:10, luck:55, san:50, move:8, build:0, db:"",
+    skills:{"Art/Craft (Literature)":40,"Charm":50,"Climb":40,"Credit Rating":30,"Dodge":40,
+      "Fighting (Brawl)":45,"History":60,"Language (Own) English":60,"Library Use":70,
+      "Occult":60,"Persuade":30,"Psychology":50,"Spot Hidden":50,"Throw":40},
+    weapons:[
+      {name:"Brawl",skill:45,dmg:"1D3",db:false,notes:"1 attack per round"},
+      {name:"Pocket knife",skill:45,dmg:"1D4",db:false,notes:"1 attack per round"}
+    ],
+    description:"Rosy faced, a little overweight, wearing plain and sensible clothing.",
+    traits:"Generous, trusting, and a risk-taker.",
+    ideology:"Superstitious and careful to avoid things like walking beneath ladders. Longs to see real evidence of the spirit world, and to see a ghost.",
+    people:"Mother, who recently passed away after an illness.",
+    locations:"", treasured:"A pocket book, in which they keep their notes and a record of their experiences.",
+    gear:["Pocket book","Two fountain pens","Small glass bottle of ink","Pocket knife"],
+    spending:"$10 on hand", cash:"$60 available in a hurry"
+  }
+];
+
+const HANDOUTS = [
+  {n:1, title:"The job", text:"A landlord, Mr. Knott, asks you to examine an old house in central Boston, known as the Corbitt House. The former tenants, the Macario family, were involved in a tragedy and the owner wishes to understand the mysterious happenings at the house and set matters straight. Mr. Knott has been unable to rent the house out since the tragedy and hopes that you can clear things up and restore its good name. He offers to pay for your time and trouble, at a rate of $20 per day. The landlord gives you the keys, the address, and $20 cash in advance.\n\nKnowing your jobs, you will want to conduct some research before you head to the house. You could check out old newspaper articles at the offices of the Boston Globe, head to the Central Library, or go to The Hall of Records. The choice is yours."},
+  {n:2, title:"Unpublished story, Boston Globe 1918", text:"A 1918 feature story, which was never published. It states that in 1880, a family of French immigrants moved into the house but fled after a series of violent accidents left the parents dead and three children crippled. The house long stood vacant.\n\nIn 1909 another family moved in, and immediately fell prey to illnesses. In 1914, the oldest brother went mad and killed himself with a kitchen knife, and the heartbroken family moved out. In 1918, a third family, the Macarios, rented the house, but they left almost immediately after they all became ill at the same time."},
+  {n:3, title:"1835", text:"In 1835, a prosperous merchant builds the house, but immediately falls ill and sells it to a Mr. Walter Corbitt, esquire."},
+  {n:4, title:"1852", text:"In 1852, Walter Corbitt is sued by neighbours, who petition to force him to leave the area, in consequence of his surious habits and unauspicious demeanor. Surious is spelled that way in the original record."},
+  {n:5, title:"1866", text:"Evidently Corbitt wins the lawsuit. His obituary in 1866 states that he still lived in the same place. It also states that a second lawsuit was being waged to prevent Corbitt from being buried in his basement, as provided by his will."},
+  {n:6, title:"The second lawsuit", text:"No outcome to the second lawsuit is recorded."},
+  {n:7, title:"The executor", text:"Civil court records show that the executor of Walter Corbitt's will was Reverend Michael Thomas, pastor of the Chapel of Contemplation and Church of Our Lord Granter of Secrets. The register of churches, also available in the Hall of Records, notes the closure of the Chapel of Contemplation in 1912."},
+  {n:8, title:"The police raid", text:"The file concerns a secret raid on the Chapel of Contemplation. The police raid was occasioned by affidavits swearing that members of the church were responsible for the disappearances of neighbourhood children. During the raid, three policemen and seventeen cult members were killed by gunplay or fire. Autopsy reports are singularly lacking detail and uninformative, as though the coroner had not actually performed examinations.\n\nThough 54 members of the church were arrested, all but eight were released. The records hint of illegal intervention in the proceedings by an important local official, offering stories of the battle, the biggest criminal action in the city's history, that never appeared in print.\n\nPastor Michael Thomas was arrested and sentenced to 40 years in prison on five counts of second-degree murder. He escaped from prison in 1917 and fled the state."},
+  {n:9, title:"The symbol on the chapel wall", text:"This handout is a picture, described here. Painted in thick white strokes on a black ground: three Y shapes arranged in a triangle, each Y's two upper arms touching the arms of its neighbours, so that the three together enclose a roughly triangular space. At the centre of that space is a single staring eye, drawn open, with a dark round pupil. The paint looks freshly swabbed on."}
+];
+
+const SAN_LOSSES = [
+  {v:"0/1", label:"0 slash 1"},
+  {v:"0/1D2", label:"0 slash 1D2"},
+  {v:"0/1D3", label:"0 slash 1D3"},
+  {v:"1/1D3", label:"1 slash 1D3"},
+  {v:"1/1D4", label:"1 slash 1D4 — seeing the bed move, or the knife attack"},
+  {v:"1/1D6", label:"1 slash 1D6"},
+  {v:"1/1D8", label:"1 slash 1D8 — seeing Corbitt move"},
+  {v:"2/1D10", label:"2 slash 1D10"}
+];
+
+// Losses that are simply suffered, with no Sanity roll at all —
+// reading the Corbitt diaries, for instance.
+const FLAT_LOSSES = ["1","2","1D2","1D3","1D4","1D6"];
+
+const MADNESS = ["Amnesia","Psychosomatic disability","Violence","Paranoia","Significant person",
+  "Faint","Flee in panic","Physical hysterics or emotional outburst","Phobia","Mania"];
+
+/* ---------------- state ---------------- */
+
+const KEY = "corbitt-files-v1";
+let S = {mode:null, charId:null, cur:{}, flags:{}, checks:{}};
+
+function load(){
+  try{
+    const raw = localStorage.getItem(KEY);
+    if(raw) S = Object.assign(S, JSON.parse(raw));
+  }catch(e){ /* private browsing, or storage disabled */ }
+}
+function save(){
+  try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){}
+}
+
+function inv(){ return INVESTIGATORS.find(i => i.id === S.charId) || null; }
+
+function initChar(id){
+  const c = INVESTIGATORS.find(i => i.id === id);
+  S.charId = id;
+  S.cur = {hp:c.hp, hpMax:c.hp, mp:c.mp, mpMax:c.mp, san:c.san, sanStart:c.san,
+           luck:c.luck, luckStart:c.luck};
+  S.flags = {}; S.checks = {};
+  save();
+}
+
+/* ---------------- announcing ---------------- */
+
+const announcer = document.getElementById("announcer");
+const politeEl  = document.getElementById("polite");
+
+function announce(msg){
+  announcer.textContent = "";
+  setTimeout(() => { announcer.textContent = msg; }, 60);
+}
+function announcePolite(msg){
+  politeEl.textContent = "";
+  setTimeout(() => { politeEl.textContent = msg; }, 60);
+}
+
+/* ---------------- dice ---------------- */
+
+function d100(mod){
+  const units = Math.floor(Math.random()*10);
+  const count = Math.abs(mod) + 1;
+  const tens = [];
+  for(let i=0;i<count;i++) tens.push(Math.floor(Math.random()*10));
+  const totals = tens.map(t => (t===0 && units===0) ? 100 : t*10 + units);
+  let total;
+  if(mod === 0) total = totals[0];
+  else if(mod > 0) total = Math.min.apply(null, totals);
+  else total = Math.max.apply(null, totals);
+  return {total: total, totals: totals};
+}
+
+function rollDice(spec){
+  spec = String(spec).trim().toUpperCase();
+  let sum = 0;
+  const parts = spec.split("+");
+  for(const p of parts){
+    const m = p.match(/^(\d*)D(\d+)$/);
+    if(m){
+      const n = parseInt(m[1] || "1", 10), f = parseInt(m[2], 10);
+      for(let i=0;i<n;i++) sum += Math.floor(Math.random()*f) + 1;
+    } else {
+      const v = parseInt(p, 10);
+      if(!isNaN(v)) sum += v;
+    }
+  }
+  return sum;
+}
+
+function half(v){ return Math.floor(v/2); }
+function fifth(v){ return Math.floor(v/5); }
+
+function levelOf(roll, skill){
+  if(roll === 1) return "Critical success";
+  if(roll === 100) return "Fumble";
+  if(skill < 50 && roll >= 96) return "Fumble";
+  if(roll <= fifth(skill)) return "Extreme success";
+  if(roll <= half(skill))  return "Hard success";
+  if(roll <= skill)        return "Regular success";
+  return "Fail";
+}
+function toneOf(lvl){
+  if(lvl === "Fumble") return "is-bad";
+  if(lvl === "Fail")   return "is-warn";
+  return "is-good";
+}
+
+/* ---------------- skills ---------------- */
+
+function allSkills(){
+  const c = inv();
+  const out = {};
+  for(const k in SKILL_BASE) out[k] = SKILL_BASE[k];
+  // Dodge starts at half DEX, but each pre-gen sheet prints its own value and
+  // those do not all equal half DEX. The printed value always wins.
+  out["Dodge"] = half(c.chars.DEX);
+  for(const k in c.skills) out[k] = c.skills[k];
+  // a trained language or art entry supersedes the generic base row
+  if(Object.keys(c.skills).some(k => k.indexOf("Art/Craft") === 0)) delete out["Art/Craft"];
+  return out;
+}
+function isCombatSkill(name){
+  return name.indexOf("Fighting") === 0 || name.indexOf("Firearms") === 0 || name === "Dodge";
+}
+
+/* ---------------- screens ---------------- */
+
+const screens = Array.prototype.slice.call(document.querySelectorAll(".screen"));
+let handoutReturn = "sheet";
+
+function go(id){
+  screens.forEach(s => { s.hidden = (s.id !== id); });
+  const sec = document.getElementById(id);
+  window.scrollTo(0,0);
+  // Build the screen's content BEFORE moving focus, so a screen reader
+  // announces the heading this screen actually ended up with.
+  if(id === "roll")      buildRoll();
+  if(id === "status")    buildStatus();
+  if(id === "combat")    buildCombat();
+  if(id === "about")     buildAbout();
+  if(id === "handouts")  buildHandouts();
+  if(id === "kpregens")  buildPregens();
+  if(id === "sheet")     buildSheetHub();
+  if(id === "tutorial")  renderStep(false);
+  if(id === "ktutorial") buildKeeperScript();
+  if(id === "kquick")    buildQuick();
+  if(id === "knpcs")     buildNPCs();
+  if(id === "krun")      buildRun();
+  if(id === "krunstate") buildRunState();
+  const h = sec.querySelector("h1,h2");
+  if(h){ h.focus(); }
+}
+
+document.addEventListener("click", function(e){
+  const b = e.target.closest("[data-go]");
+  if(!b) return;
+  const dest = b.getAttribute("data-go");
+  if(dest === "handouts"){
+    handoutReturn = (S.mode === "keeper") ? "keeper" : "sheet";
+  }
+  if(dest === "keeper") S.mode = "keeper";
+  if(dest === "choose") S.mode = "player";
+  save();
+  go(dest);
+});
+
+document.getElementById("ho-back").addEventListener("click", function(){ go(handoutReturn); });
+
+/* ---------------- choose ---------------- */
+
+function buildChoose(){
+  const wrap = document.getElementById("choose-list");
+  wrap.innerHTML = "";
+  INVESTIGATORS.forEach(function(c){
+    const b = document.createElement("button");
+    b.className = "skill";
+    b.setAttribute("aria-label", c.occupation + ". " + c.blurb + ". Age " + c.age +
+      ". " + c.hp + " hit points, Sanity " + c.san + ". Choose this investigator.");
+    b.innerHTML = '<span class="sname">' + c.occupation + '</span>' +
+                  '<span class="svals">' + c.blurb + ' &middot; age ' + c.age +
+                  ' &middot; ' + c.hp + ' HP &middot; SAN ' + c.san + '</span>';
+    b.addEventListener("click", function(){
+      initChar(c.id);
+      go("sheet");
+      announcePolite("You are playing the " + c.occupation + ".");
+    });
+    wrap.appendChild(b);
+  });
+}
+
+function buildSheetHub(){
+  const c = inv();
+  if(!c){ go("choose"); return; }
+  document.getElementById("sheet-sub").textContent =
+    c.occupation + ", age " + c.age + ", of " + c.residence + ". " +
+    S.cur.hp + " of " + S.cur.hpMax + " hit points, Sanity " + S.cur.san + ".";
+}
+
+/* ---------------- roll screen ---------------- */
+
+let mod = 0;
+let lastRoll = null;
+
+function setResult(boxId, vId, dId, lvl, detail){
+  const box = document.getElementById(boxId);
+  box.className = "res " + toneOf(lvl);
+  document.getElementById(vId).textContent = lvl;
+  document.getElementById(dId).textContent = detail;
+}
+
+function buildModRow(){
+  const row = document.getElementById("mod-row");
+  row.innerHTML = "";
+  const opts = [
+    {v:-2, t:"2 penalty"}, {v:-1, t:"1 penalty"}, {v:0, t:"None"},
+    {v:1, t:"1 bonus"},   {v:2, t:"2 bonus"}
+  ];
+  opts.forEach(function(o){
+    const b = document.createElement("button");
+    b.textContent = o.t;
+    b.setAttribute("aria-pressed", String(mod === o.v));
+    b.setAttribute("aria-label", o.v === 0 ? "No extra dice" :
+      (Math.abs(o.v) + " " + (o.v > 0 ? "bonus" : "penalty") + (Math.abs(o.v) > 1 ? " dice" : " die")));
+    b.addEventListener("click", function(){
+      mod = o.v; buildModRow();
+      announcePolite(o.v === 0 ? "No extra dice." : b.getAttribute("aria-label") + " set for the next roll.");
+    });
+    row.appendChild(b);
+  });
+}
+
+function describeMod(m){
+  if(m === 0) return "";
+  return ", with " + Math.abs(m) + " " + (m > 0 ? "bonus" : "penalty") + (Math.abs(m) > 1 ? " dice" : " die");
+}
+
+function doRoll(name, skill, opts){
+  opts = opts || {};
+  const usedMod = opts.forceMod !== undefined ? opts.forceMod : mod;
+  const r = d100(usedMod);
+  const lvl = levelOf(r.total, skill);
+  let detail = "Rolled " + r.total + " against " + name + " " + skill +
+               describeMod(usedMod) + ".";
+  if(usedMod !== 0) detail += " The dice gave " + r.totals.join(" and ") + ".";
+  if(opts.pushed) detail = "Pushed roll. " + detail;
+
+  const box = opts.box || "1";
+  setResult("res" + box, "res" + box + "-v", "res" + box + "-d", lvl, detail);
+  announce(lvl + ". " + detail);
+
+  const failed = (lvl === "Fail" || lvl === "Fumble");
+  if(!failed && !opts.pushed){
+    S.checks[name] = true; save();
+  }
+
+  lastRoll = {name:name, skill:skill, pushable: !isCombatSkill(name) && !opts.pushed && failed};
+  mod = 0; buildModRow(); buildPush();
+  return lvl;
+}
+
+function buildPush(){
+  const w = document.getElementById("push-wrap");
+  w.innerHTML = "";
+  if(lastRoll && lastRoll.pushable){
+    const b = document.createElement("button");
+    b.className = "primary";
+    b.textContent = "Push this " + lastRoll.name + " roll";
+    b.setAttribute("aria-label", "Push this " + lastRoll.name + " roll. Say what your investigator does differently. If this fails, the Keeper inflicts a consequence.");
+    b.addEventListener("click", function(){
+      doRoll(lastRoll.name, lastRoll.skill, {pushed:true, forceMod:0});
+    });
+    w.appendChild(b);
+  }
+}
+
+function skillButton(name, value, untrained){
+  const b = document.createElement("button");
+  b.className = "skill" + (untrained ? " untrained" : "");
+  b.setAttribute("aria-label", name + ". " + value + ". Hard " + half(value) +
+    ". Extreme " + fifth(value) + ". Roll.");
+  b.innerHTML = '<span class="sname">' + name + '</span>' +
+    '<span class="svals">' + value + ', hard ' + half(value) + ', extreme ' + fifth(value) + '</span>';
+  b.addEventListener("click", function(){ doRoll(name, value, {box:"1"}); });
+  return b;
+}
+
+function buildRoll(){
+  const c = inv();
+  if(!c){ go("choose"); return; }
+  buildModRow();
+  buildPush();
+
+  const ch = document.getElementById("chars-list");
+  ch.innerHTML = "";
+  Object.keys(CHAR_NAMES).forEach(function(k){
+    ch.appendChild(skillButton(CHAR_NAMES[k], c.chars[k], false));
+  });
+
+  const skills = allSkills();
+  const trainedNames = Object.keys(c.skills).slice();
+  if(trainedNames.indexOf("Dodge") === -1) trainedNames.push("Dodge");
+  const mine = document.getElementById("skills-list");
+  const rest = document.getElementById("untrained-list");
+  mine.innerHTML = ""; rest.innerHTML = "";
+
+  trainedNames.sort().forEach(function(n){
+    mine.appendChild(skillButton(n, skills[n], false));
+  });
+  Object.keys(skills).sort().forEach(function(n){
+    if(trainedNames.indexOf(n) === -1) rest.appendChild(skillButton(n, skills[n], true));
+  });
+}
+
+/* ---------------- status ---------------- */
+
+function tracker(cfg){
+  const wrap = document.createElement("div");
+  wrap.className = "track";
+  const h = document.createElement("h3");
+  h.textContent = cfg.label + ": " + cfg.get() + (cfg.max ? " of " + cfg.max() : "");
+  wrap.appendChild(h);
+
+  const row = document.createElement("div");
+  row.className = "row";
+  cfg.buttons.forEach(function(spec){
+    const b = document.createElement("button");
+    b.textContent = spec.t;
+    b.setAttribute("aria-label", spec.aria);
+    b.addEventListener("click", function(){
+      const msg = spec.act();
+      buildStatus();
+      announce(msg);
+    });
+    row.appendChild(b);
+  });
+  wrap.appendChild(row);
+
+  if(cfg.entry){
+    const id = "entry-" + cfg.key;
+    const lab = document.createElement("label");
+    lab.setAttribute("for", id);
+    lab.textContent = cfg.entry.label;
+    const inp = document.createElement("input");
+    inp.type = "number"; inp.className = "num"; inp.id = id; inp.min = "0"; inp.inputMode = "numeric";
+    const go = document.createElement("button");
+    go.className = "small"; go.textContent = cfg.entry.button;
+    go.setAttribute("aria-label", cfg.entry.button);
+    go.addEventListener("click", function(){
+      const n = parseInt(inp.value, 10);
+      if(isNaN(n) || n <= 0){ announce("Enter a number first."); return; }
+      const msg = cfg.entry.act(n);
+      inp.value = "";
+      buildStatus();
+      announce(msg);
+    });
+    const r2 = document.createElement("div"); r2.className = "row";
+    r2.appendChild(inp); r2.appendChild(go);
+    wrap.appendChild(lab); wrap.appendChild(r2);
+  }
+  return wrap;
+}
+
+function clampCur(){
+  S.cur.hp = Math.max(0, Math.min(S.cur.hp, S.cur.hpMax));
+  S.cur.mp = Math.max(0, Math.min(S.cur.mp, S.cur.mpMax));
+  S.cur.san = Math.max(0, S.cur.san);
+  S.cur.luck = Math.max(0, S.cur.luck);
+}
+
+function applyDamage(n){
+  const before = S.cur.hp;
+  S.cur.hp = Math.max(0, S.cur.hp - n);
+  let msg = "You take " + n + " damage. " + S.cur.hp + " hit points left.";
+  if(n >= S.cur.hpMax){
+    S.flags["Dying"] = true;
+    msg += " That is equal to your maximum hit points in one blow, which is fatal. Tell the Keeper.";
+  } else if(n >= Math.ceil(S.cur.hpMax/2)){
+    S.flags["Major wound"] = true;
+    msg += " That is a major wound.";
+  }
+  if(S.cur.hp === 0){
+    if(S.flags["Major wound"]){ S.flags["Dying"] = true; msg += " You are dying."; }
+    else { S.flags["Unconscious"] = true; msg += " You are unconscious."; }
+  }
+  if(before === S.cur.hp && n > 0) msg += " You were already at zero.";
+  save();
+  return msg;
+}
+
+function buildStatus(){
+  const c = inv();
+  if(!c){ go("choose"); return; }
+  clampCur();
+  const t = document.getElementById("tracks");
+  t.innerHTML = "";
+
+  t.appendChild(tracker({
+    key:"hp", label:"Hit points", get:function(){return S.cur.hp;}, max:function(){return S.cur.hpMax;},
+    buttons:[
+      {t:"Minus 1", aria:"Lose 1 hit point", act:function(){ return applyDamage(1); }},
+      {t:"Plus 1", aria:"Regain 1 hit point", act:function(){ S.cur.hp = Math.min(S.cur.hpMax, S.cur.hp+1); save(); return "1 hit point back. " + S.cur.hp + " of " + S.cur.hpMax + "."; }},
+      {t:"First Aid", aria:"First Aid, heal 1 hit point", act:function(){ S.cur.hp = Math.min(S.cur.hpMax, S.cur.hp+1); save(); return "First Aid. " + S.cur.hp + " of " + S.cur.hpMax + " hit points."; }},
+      {t:"Medicine", aria:"Medicine, heal 1D3 hit points", act:function(){ const n = rollDice("1D3"); S.cur.hp = Math.min(S.cur.hpMax, S.cur.hp+n); save(); return "Medicine heals " + n + ". " + S.cur.hp + " of " + S.cur.hpMax + " hit points."; }}
+    ],
+    entry:{label:"Take a specific amount of damage", button:"Apply damage", act:applyDamage}
+  }));
+
+  t.appendChild(tracker({
+    key:"san", label:"Sanity", get:function(){return S.cur.san;},
+    buttons:[
+      {t:"Minus 1", aria:"Lose 1 Sanity point", act:function(){ S.cur.san = Math.max(0,S.cur.san-1); save(); return "Sanity " + S.cur.san + "."; }},
+      {t:"Plus 1", aria:"Regain 1 Sanity point", act:function(){ S.cur.san += 1; save(); return "Sanity " + S.cur.san + "."; }}
+    ],
+    entry:{label:"Lose a specific amount of Sanity", button:"Lose Sanity", act:function(n){
+      S.cur.san = Math.max(0, S.cur.san - n); save();
+      return "Lost " + n + " Sanity. You are on " + S.cur.san + ".";
+    }}
+  }));
+
+  t.appendChild(tracker({
+    key:"mp", label:"Magic points", get:function(){return S.cur.mp;}, max:function(){return S.cur.mpMax;},
+    buttons:[
+      {t:"Minus 1", aria:"Spend 1 magic point", act:function(){ S.cur.mp = Math.max(0,S.cur.mp-1); save(); return "Magic points " + S.cur.mp + "."; }},
+      {t:"Plus 1", aria:"Regain 1 magic point", act:function(){ S.cur.mp = Math.min(S.cur.mpMax,S.cur.mp+1); save(); return "Magic points " + S.cur.mp + "."; }}
+    ]
+  }));
+
+  t.appendChild(tracker({
+    key:"luck", label:"Luck", get:function(){return S.cur.luck;},
+    buttons:[
+      {t:"Roll Luck", aria:"Roll a Luck roll", act:function(){
+        const r = d100(0); const lvl = levelOf(r.total, S.cur.luck);
+        return lvl + ". Rolled " + r.total + " against Luck " + S.cur.luck + ".";
+      }},
+      {t:"Minus 1", aria:"Spend 1 Luck point", act:function(){ S.cur.luck = Math.max(0,S.cur.luck-1); save(); return "Luck " + S.cur.luck + "."; }},
+      {t:"Plus 1", aria:"Regain 1 Luck point", act:function(){ S.cur.luck += 1; save(); return "Luck " + S.cur.luck + "."; }}
+    ]
+  }));
+
+  const FLAGS = ["Major wound","Unconscious","Dying","Temporary insanity","Indefinite insanity"];
+  const f = document.getElementById("flags");
+  f.innerHTML = "";
+  FLAGS.forEach(function(name){
+    const b = document.createElement("button");
+    const on = !!S.flags[name];
+    b.textContent = name;
+    b.setAttribute("aria-pressed", String(on));
+    b.addEventListener("click", function(){
+      S.flags[name] = !S.flags[name]; save(); buildStatus();
+      announce(name + (S.flags[name] ? " on." : " off."));
+    });
+    f.appendChild(b);
+  });
+}
+
+document.getElementById("btn-reset").addEventListener("click", function(){
+  const c = inv(); if(!c) return;
+  initChar(c.id); buildStatus();
+  announce("Reset. Full hit points, Sanity and magic points, and no conditions.");
+});
+
+/* ---------------- combat ---------------- */
+
+function buildCombat(){
+  const c = inv();
+  if(!c){ go("choose"); return; }
+  const w = document.getElementById("weapons-list");
+  w.innerHTML = "";
+  c.weapons.forEach(function(wp){
+    const b = document.createElement("button");
+    b.className = "skill";
+    const dmgText = wp.dmg + (wp.db && c.db ? " plus " + c.db + " damage bonus" : "");
+    b.setAttribute("aria-label", wp.name + ". Skill " + wp.skill + ", hard " + half(wp.skill) +
+      ", extreme " + fifth(wp.skill) + ". Damage " + dmgText + ". " + wp.notes + ". Attack.");
+    b.innerHTML = '<span class="sname">' + wp.name + '</span>' +
+      '<span class="svals">' + wp.skill + ', hard ' + half(wp.skill) + ', extreme ' + fifth(wp.skill) +
+      ' &middot; damage ' + dmgText + '</span>';
+    b.addEventListener("click", function(){ doRoll(wp.name, wp.skill, {box:"2"}); });
+    w.appendChild(b);
+  });
+
+  const d = document.getElementById("defend-list");
+  d.innerHTML = "";
+  const dodge = allSkills()["Dodge"];
+  const db = document.createElement("button");
+  db.className = "skill";
+  db.setAttribute("aria-label", "Dodge. " + dodge + ". Hard " + half(dodge) + ". Extreme " + fifth(dodge) +
+    ". You need to equal or beat the attacker's level of success. Roll.");
+  db.innerHTML = '<span class="sname">Dodge</span><span class="svals">' + dodge +
+    ', hard ' + half(dodge) + ', extreme ' + fifth(dodge) + ' &middot; equal or beat the attacker</span>';
+  db.addEventListener("click", function(){ doRoll("Dodge", dodge, {box:"2"}); });
+  d.appendChild(db);
+
+  const fightSkills = Object.keys(c.skills).filter(function(k){ return k.indexOf("Fighting") === 0; });
+  if(fightSkills.length === 0) fightSkills.push("Fighting (Brawl)");
+  fightSkills.forEach(function(n){
+    const val = c.skills[n] !== undefined ? c.skills[n] : SKILL_BASE["Fighting (Brawl)"];
+    const b = document.createElement("button");
+    b.className = "skill";
+    b.setAttribute("aria-label", "Fight back with " + n + ". " + val + ". Hard " + half(val) +
+      ". Extreme " + fifth(val) + ". You must beat the attacker's level of success. Roll.");
+    b.innerHTML = '<span class="sname">Fight back: ' + n + '</span><span class="svals">' + val +
+      ', hard ' + half(val) + ', extreme ' + fifth(val) + ' &middot; must beat the attacker</span>';
+    b.addEventListener("click", function(){ doRoll(n, val, {box:"2"}); });
+    d.appendChild(b);
+  });
+
+  const dm = document.getElementById("dmg-list");
+  dm.innerHTML = "";
+  c.weapons.forEach(function(wp){
+    const spec = wp.dmg + (wp.db && c.db ? "+" + c.db : "");
+    const b = document.createElement("button");
+    b.textContent = "Roll damage for " + wp.name + " (" + spec.replace("+"," plus ") + ")";
+    b.setAttribute("aria-label", "Roll damage for " + wp.name);
+    b.addEventListener("click", function(){
+      const n = rollDice(spec);
+      setResult("res2","res2-v","res2-d","Damage " + n, wp.name + " deals " + n + " damage.");
+      document.getElementById("res2").className = "res";
+      announce(wp.name + " deals " + n + " damage.");
+    });
+    dm.appendChild(b);
+  });
+}
+
+/* ---------------- sanity ---------------- */
+
+function buildSanSelect(){
+  const sel = document.getElementById("san-loss");
+  sel.innerHTML = "";
+  SAN_LOSSES.forEach(function(o){
+    const op = document.createElement("option");
+    op.value = o.v; op.textContent = o.label;
+    sel.appendChild(op);
+  });
+  sel.value = "1/1D8";
+
+  const flat = document.getElementById("san-flat");
+  flat.innerHTML = "";
+  FLAT_LOSSES.forEach(function(v){
+    const op = document.createElement("option");
+    op.value = v;
+    op.textContent = v.indexOf("D") === -1 ? v + " point" + (v === "1" ? "" : "s") : v.replace("D"," D ");
+    flat.appendChild(op);
+  });
+  flat.value = "1D4";
+}
+
+document.getElementById("btn-san-flat").addEventListener("click", function(){
+  if(!inv()) return;
+  const spec = document.getElementById("san-flat").value;
+  const loss = rollDice(spec);
+  const before = S.cur.san;
+  S.cur.san = Math.max(0, S.cur.san - loss);
+  if(S.cur.san === 0) S.flags["Indefinite insanity"] = true;
+  save();
+  const msg = "You lose " + loss + " Sanity, with no roll to resist. You were on " +
+              before + " and are now on " + S.cur.san + ".";
+  const box = document.getElementById("res3");
+  box.className = "res is-warn";
+  document.getElementById("res3-v").textContent = "Lost " + loss + " Sanity";
+  document.getElementById("res3-d").textContent = msg;
+  document.getElementById("san-followup").innerHTML = "";
+  announce("Lost " + loss + " Sanity. " + msg);
+});
+
+document.getElementById("btn-san-roll").addEventListener("click", function(){
+  const c = inv(); if(!c) return;
+  const spec = document.getElementById("san-loss").value;
+  const parts = spec.split("/");
+  const r = d100(0);
+  const passed = r.total <= S.cur.san;
+  const lossSpec = passed ? parts[0] : (parts[1] !== undefined ? parts[1] : parts[0]);
+  const loss = rollDice(lossSpec);
+  const before = S.cur.san;
+  S.cur.san = Math.max(0, S.cur.san - loss);
+
+  let verdict = passed ? "Held on" : "Shaken";
+  let detail = "Rolled " + r.total + " against Sanity " + before + ". " +
+    (passed ? "Under, so the lesser loss. " : "Over, so the greater loss. ") +
+    "You lose " + loss + " Sanity. You are now on " + S.cur.san + ".";
+
+  const box = document.getElementById("res3");
+  box.className = "res " + (passed ? "is-good" : "is-warn");
+  document.getElementById("res3-v").textContent = verdict;
+  document.getElementById("res3-d").textContent = detail;
+
+  const fu = document.getElementById("san-followup");
+  fu.innerHTML = "";
+
+  if(loss >= 5){
+    detail += " That is 5 or more at once, which is major emotional trauma.";
+    const b = document.createElement("button");
+    b.className = "primary";
+    b.textContent = "Roll INT for temporary insanity";
+    b.setAttribute("aria-label", "Roll against Intelligence. Passing means your investigator understood what they saw and goes temporarily insane.");
+    b.addEventListener("click", function(){
+      const ir = d100(0);
+      const pass = ir.total <= c.chars.INT;
+      let m;
+      if(pass){
+        S.flags["Temporary insanity"] = true; save();
+        m = "Rolled " + ir.total + " against INT " + c.chars.INT + ". Passed, so your investigator understands what they have seen and goes temporarily insane for 1D10 hours. Ask the Keeper for a bout of madness.";
+      } else {
+        m = "Rolled " + ir.total + " against INT " + c.chars.INT + ". Failed, so your mind closes to the horror. You stay sane, for now.";
+      }
+      document.getElementById("res3-v").textContent = pass ? "Temporarily insane" : "Still sane";
+      document.getElementById("res3-d").textContent = m;
+      box.className = "res " + (pass ? "is-bad" : "is-good");
+      announce((pass ? "Temporarily insane. " : "Still sane. ") + m);
+      fu.innerHTML = "";
+    });
+    fu.appendChild(b);
+  }
+
+  if(S.cur.san === 0){ S.flags["Indefinite insanity"] = true; }
+  save();
+  announce(verdict + ". " + detail);
+});
+
+/* ---------------- about ---------------- */
+
+function line(dl, k, v){
+  if(!v) return;
+  const dt = document.createElement("dt"); dt.textContent = k;
+  const dd = document.createElement("dd"); dd.textContent = v;
+  dl.appendChild(dt); dl.appendChild(dd);
+}
+
+function buildAbout(){
+  const c = inv();
+  if(!c){ go("choose"); return; }
+  const body = document.getElementById("about-body");
+  body.innerHTML = "";
+
+  const p = document.createElement("p");
+  p.textContent = c.occupation + ", age " + c.age + ", of " + c.residence + ".";
+  body.appendChild(p);
+
+  const h1 = document.createElement("h3"); h1.textContent = "Characteristics"; body.appendChild(h1);
+  const dl1 = document.createElement("dl");
+  Object.keys(CHAR_NAMES).forEach(function(k){
+    line(dl1, CHAR_NAMES[k], c.chars[k] + ", hard " + half(c.chars[k]) + ", extreme " + fifth(c.chars[k]));
+  });
+  line(dl1, "Move", String(c.move));
+  line(dl1, "Build", String(c.build));
+  line(dl1, "Damage bonus", c.db ? c.db : "none");
+  body.appendChild(dl1);
+
+  const h2 = document.createElement("h3"); h2.textContent = "Backstory"; body.appendChild(h2);
+  const dl2 = document.createElement("dl");
+  line(dl2, "Personal description", c.description);
+  line(dl2, "Traits", c.traits);
+  line(dl2, "Ideology and beliefs", c.ideology);
+  line(dl2, "Significant people", c.people);
+  line(dl2, "Meaningful locations", c.locations);
+  line(dl2, "Treasured possessions", c.treasured);
+  body.appendChild(dl2);
+
+  const h3 = document.createElement("h3"); h3.textContent = "Gear and possessions"; body.appendChild(h3);
+  const ul = document.createElement("ul");
+  c.gear.forEach(function(g){ const li = document.createElement("li"); li.textContent = g; ul.appendChild(li); });
+  body.appendChild(ul);
+
+  const h4 = document.createElement("h3"); h4.textContent = "Wealth"; body.appendChild(h4);
+  const dl3 = document.createElement("dl");
+  line(dl3, "Spending level", c.spending);
+  line(dl3, "Cash", c.cash);
+  body.appendChild(dl3);
+
+  const checked = Object.keys(S.checks || {});
+  const h5 = document.createElement("h3"); h5.textContent = "Skills to check for experience"; body.appendChild(h5);
+  const p2 = document.createElement("p");
+  p2.textContent = checked.length
+    ? "At the end of the scenario, roll for these: " + checked.sort().join(", ") + "."
+    : "None yet. Succeed at a skill roll and it is recorded here.";
+  body.appendChild(p2);
+}
+
+/* ---------------- handouts ---------------- */
+
+function buildHandouts(){
+  const body = document.getElementById("ho-body");
+  body.innerHTML = "";
+  HANDOUTS.forEach(function(h){
+    const wrap = document.createElement("div");
+    wrap.className = "panel";
+    const hh = document.createElement("h3");
+    hh.textContent = "Handout " + h.n + ": " + h.title;
+    hh.style.marginTop = "0";
+    wrap.appendChild(hh);
+    h.text.split("\n\n").forEach(function(para){
+      const p = document.createElement("p");
+      p.textContent = para;
+      wrap.appendChild(p);
+    });
+    body.appendChild(wrap);
+  });
+}
+
+/* ---------------- keeper pregens ---------------- */
+
+function buildPregens(){
+  const body = document.getElementById("kp-body");
+  body.innerHTML = "";
+  INVESTIGATORS.forEach(function(c){
+    const wrap = document.createElement("div");
+    wrap.className = "panel";
+    const h = document.createElement("h3");
+    h.textContent = c.occupation;
+    h.style.marginTop = "0";
+    wrap.appendChild(h);
+
+    const p = document.createElement("p");
+    p.textContent = c.blurb + ". Age " + c.age + ". " + c.hp + " HP, " + c.mp +
+      " MP, Luck " + c.luck + ", Sanity " + c.san + ". Move " + c.move + ", Build " + c.build +
+      (c.db ? ", damage bonus " + c.db : ", no damage bonus") + ".";
+    wrap.appendChild(p);
+
+    const pc = document.createElement("p");
+    pc.textContent = Object.keys(CHAR_NAMES).map(function(k){ return k + " " + c.chars[k]; }).join(", ") + ".";
+    wrap.appendChild(pc);
+
+    const ps = document.createElement("p");
+    ps.textContent = "Skills: " + Object.keys(c.skills).sort().map(function(k){
+      return k + " " + c.skills[k];
+    }).join(", ") + ".";
+    wrap.appendChild(ps);
+
+    const pw = document.createElement("p");
+    pw.textContent = "Weapons: " + c.weapons.map(function(w){
+      return w.name + " " + w.skill + "%, damage " + w.dmg + (w.db && c.db ? " plus " + c.db : "");
+    }).join("; ") + ".";
+    wrap.appendChild(pw);
+
+    body.appendChild(wrap);
+  });
+}
+
+/* ---------------- madness roll ---------------- */
+
+document.getElementById("btn-madness").addEventListener("click", function(){
+  const n = rollDice("1D10");
+  const name = MADNESS[n-1];
+  document.getElementById("res4-v").textContent = n + ". " + name;
+  document.getElementById("res4-d").textContent = "Lasts 1D10 rounds. Read the full entry below.";
+  announce("Rolled " + n + ". " + name + ".");
+});
+
+/* ---------------- tutorial ---------------- */
+
+// Fixed practice numbers so the lesson text can name exact targets.
+// Nothing here ever touches the real investigator's state.
+const PRACTICE = {spot:50, climb:40, dodge:40, fighting:45, luck:50, hpMax:12, san:60, int:60};
+let tHP = PRACTICE.hpMax, tSAN = PRACTICE.san, tPush = null, tStep = 0;
+
+function tres(verdict, detail, tone){
+  const box = document.getElementById("res5");
+  box.className = "res " + (tone || "");
+  document.getElementById("res5-v").textContent = verdict;
+  document.getElementById("res5-d").textContent = detail;
+  announce(verdict + ". " + detail);
+}
+
+function tRoll(name, skill, m){
+  m = m || 0;
+  const r = d100(m);
+  const lvl = levelOf(r.total, skill);
+  let d = "Rolled " + r.total + " against " + name + " " + skill + describeMod(m) + ".";
+  if(m !== 0){
+    d += " The tens dice gave " + r.totals.join(" and ") + ", and you keep the " +
+         (m > 0 ? "better" : "worse") + " one.";
+  }
+  tres(lvl, d, toneOf(lvl));
+  return {roll:r.total, lvl:lvl, failed:(lvl === "Fail" || lvl === "Fumble")};
+}
+
+function bands(skill){
+  const lowSkill = skill < 50;
+  return "Skill " + skill + ". Critical on 1. Extreme, " + fifth(skill) + " or less. Hard, " +
+    half(skill) + " or less. Regular, " + skill + " or less. Fail, " + (skill+1) + " to " +
+    (lowSkill ? 95 : 99) + ". Fumble, " + (lowSkill ? "96 or more." : "100.");
+}
+
+function tBtn(parent, label, aria, fn, primary){
+  const b = document.createElement("button");
+  b.textContent = label;
+  if(aria) b.setAttribute("aria-label", aria);
+  if(primary) b.className = "primary";
+  b.addEventListener("click", fn);
+  parent.appendChild(b);
+  return b;
+}
+
+const RANK = {"Fumble":0,"Fail":0,"Regular success":1,"Hard success":2,
+              "Extreme success":3,"Critical success":4};
+
+const LESSONS = [
+{
+  title:"How this actually works",
+  keeper:"Before we touch a die, here is the whole shape of it. I describe a situation. You tell me what your investigator does, in your own words. If what you are trying is uncertain and dramatic, I will ask for a roll. Most of an evening is just us talking.",
+  watch:"Do not let anyone open with “what can I roll?” Get them describing actions first. The dice are the exception, not the default.",
+  body:[
+    "One of us is the Keeper. He describes the world and plays everyone in it.",
+    "The rest of us play investigators: ordinary people in 1920s Boston who have agreed to look into something strange.",
+    "You are not a hero. You are a person with a job and a bad feeling. Running away is very often the correct move, and nobody at this table will think less of you for it."
+  ]
+},
+{
+  title:"Your first roll",
+  keeper:"Everyone find Spot Hidden and tell me the first number you hear. Now roll it. If you rolled equal to or under your number, you spotted the thing.",
+  watch:"About half of them will fail. Say out loud that failing is normal and the story keeps moving. This is the single most important expectation to set tonight.",
+  body:[
+    "Almost everything in this game is one roll of a hundred against a number on your sheet.",
+    "Roll equal to or under that number and you succeed. That is the entire core of it.",
+    "Your practice skill here is Spot Hidden 50, so you will succeed about half the time. Try it a few times."
+  ],
+  build:function(c){
+    tBtn(c, "Roll Spot Hidden 50", "Roll Spot Hidden 50", function(){
+      tRoll("Spot Hidden", PRACTICE.spot);
+    }, true);
+  }
+},
+{
+  title:"Three levels of success",
+  keeper:"Some things are harder than others. I will tell you which level I need before you roll: Regular, Hard, or Extreme. Regular is your full number, Hard is half of it, Extreme is a fifth.",
+  watch:"Say the level and the actual target number out loud every single time. It costs you nothing and it means nobody has to do arithmetic in their head.",
+  body:[
+    "Regular success is your skill or less. With Spot Hidden 50, that is 50 or less.",
+    "Hard success is half your skill or less, so 25 or less.",
+    "Extreme success is a fifth of your skill or less, so 10 or less.",
+    "You never choose the level. The Keeper says what the situation demands, then you roll and find out how well you did. The app always tells you the best level you reached."
+  ],
+  build:function(c){
+    tBtn(c, "Roll Spot Hidden 50", "Roll Spot Hidden 50 and hear which level you reached", function(){
+      tRoll("Spot Hidden", PRACTICE.spot);
+    }, true);
+    tBtn(c, "Say the target numbers again", "Hear the target numbers for Spot Hidden 50", function(){
+      tres("Spot Hidden 50", bands(PRACTICE.spot));
+    });
+  }
+},
+{
+  title:"Criticals and fumbles",
+  keeper:"Two special results. A roll of 1 is a critical, the best thing that could plausibly happen. A roll of 100 is a fumble, and something goes actively wrong. And if your skill is below 50, then 96 or higher also fumbles, because being unskilled means you can fail badly.",
+  watch:"Make a fumble cost something interesting rather than just failing. The gun jams, the floorboard gives, the librarian looks up.",
+  body:[
+    "A roll of 1 is a critical success.",
+    "A roll of 100 is always a fumble.",
+    "If your skill is under 50, anything from 96 up is also a fumble. So the less you know, the worse your bad days.",
+    "You do not have to remember any of this. Listen to the two examples below and notice how the fumble range changes."
+  ],
+  build:function(c){
+    tBtn(c, "Bands for a skill of 40", "Hear the result bands for a skill of 40", function(){
+      tres("A skill of 40", bands(40) + " Because 40 is under 50, the fumble range is wider.");
+    }, true);
+    tBtn(c, "Bands for a skill of 70", "Hear the result bands for a skill of 70", function(){
+      tres("A skill of 70", bands(70) + " Because 70 is 50 or more, only 100 fumbles.");
+    });
+  }
+},
+{
+  title:"Pushing a failed roll",
+  keeper:"When you fail, you can usually try once more. But you have to tell me what your investigator is doing differently: searching more thoroughly, forcing the door, pressing the man harder. And the price goes up. If the pushed roll fails, I get to make something genuinely bad happen.",
+  watch:"Before they commit, foreshadow the consequence out loud. “You can try again, but if you fail this one, whatever is upstairs will hear you.” Then let them choose.",
+  body:[
+    "A failed roll is not the end of it.",
+    "You may push it once, if you can say what your investigator is doing differently.",
+    "The stakes rise. Fail the push and the Keeper inflicts something real: harm, noise, lost time, a broken possession. Not merely failure.",
+    "You cannot push combat rolls, and you cannot push Sanity rolls.",
+    "Roll Climb below until you fail, and a push button will appear."
+  ],
+  build:function(c){
+    const holder = document.createElement("div");
+    tBtn(c, "Roll Climb 40", "Roll Climb 40", function(){
+      const r = tRoll("Climb", PRACTICE.climb);
+      holder.innerHTML = "";
+      if(r.failed){
+        tBtn(holder, "Push the Climb roll", "Push the Climb roll. Say what you are doing differently.", function(){
+          const p = tRoll("Climb", PRACTICE.climb);
+          holder.innerHTML = "";
+          const extra = p.failed
+            ? " You failed the push, so the Keeper now inflicts a real consequence."
+            : " The push succeeded, and you got there.";
+          tres(p.lvl, "Pushed roll. Rolled " + p.roll + " against Climb 40." + extra,
+               p.failed ? "is-bad" : "is-good");
+        }, true);
+      } else {
+        const p = document.createElement("p");
+        p.className = "sub";
+        p.textContent = "You succeeded, so there is nothing to push. Roll again to see a failure.";
+        holder.appendChild(p);
+      }
+    }, true);
+    c.appendChild(holder);
+  }
+},
+{
+  title:"Bonus and penalty dice",
+  keeper:"Sometimes the situation helps or hinders you. Good light, a running start, the man already likes you: that is a bonus die. Wounded, rushed, working in the dark: a penalty die. I will say which, and your app handles the rest.",
+  watch:"Reach for these when the circumstances changed rather than the task. Change the difficulty when the task itself is harder.",
+  body:[
+    "A bonus die means you roll an extra tens die and keep the better result.",
+    "A penalty die means you roll an extra tens die and keep the worse one.",
+    "One bonus and one penalty cancel each other out.",
+    "You never work this out yourself. Listen below and you will hear both dice and which one was kept."
+  ],
+  build:function(c){
+    tBtn(c, "Roll Spot Hidden with a bonus die", "Roll Spot Hidden 50 with one bonus die", function(){
+      tRoll("Spot Hidden", PRACTICE.spot, 1);
+    }, true);
+    tBtn(c, "Roll Spot Hidden with a penalty die", "Roll Spot Hidden 50 with one penalty die", function(){
+      tRoll("Spot Hidden", PRACTICE.spot, -1);
+    });
+  }
+},
+{
+  title:"Luck",
+  keeper:"Luck is for questions that are not about your ability at all. Is there anything in this room I could use as a weapon? Does the torch still have juice in it? Is there a cab at this hour? That is Luck.",
+  watch:"If a skill fits the question better, use the skill. Luck is for circumstance, not competence.",
+  body:[
+    "Luck is a number like any other, and you roll under it the same way.",
+    "Use it when the question is about the world rather than about you.",
+    "If the Keeper asks for a group Luck roll, whoever has the lowest Luck rolls for everybody. That is not an accident: it is meant to hurt."
+  ],
+  build:function(c){
+    tBtn(c, "Roll Luck 50", "Roll Luck 50", function(){
+      tRoll("Luck", PRACTICE.luck);
+    }, true);
+  }
+},
+{
+  title:"Getting hurt",
+  keeper:"You have hit points, and twelve is typical. Losing a few is survivable. The thing to watch for is a major wound.",
+  watch:"The first damage in this scenario is usually a ten-foot fall for 1D6. Use it to walk them through the tracker on their own device rather than explaining it now.",
+  body:[
+    "Damage comes off your hit points.",
+    "A major wound is losing half your maximum or more from one single hit. With 12 hit points, that means 6 or more at once.",
+    "At 0 hit points without a major wound you fall unconscious. At 0 with a major wound you are dying.",
+    "Damage equal to your whole maximum in one blow kills you outright.",
+    "You do not have to track any of that. Enter the damage and the app tells you what just happened."
+  ],
+  build:function(c){
+    tBtn(c, "Take 3 damage", "Take 3 practice damage", function(){
+      tHP = Math.max(0, tHP - 3);
+      tres("3 damage", "You are on " + tHP + " of 12 hit points. That is not a major wound.", "is-warn");
+    }, true);
+    tBtn(c, "Take 6 damage", "Take 6 practice damage, which is a major wound", function(){
+      tHP = Math.max(0, tHP - 6);
+      tres("6 damage, a major wound", "Six is half of twelve, so that is a major wound. You are on " +
+        tHP + " of 12 hit points.", "is-bad");
+    });
+    tBtn(c, "Back to full health", "Reset practice hit points to 12", function(){
+      tHP = PRACTICE.hpMax;
+      tres("Healed", "Back to 12 of 12 practice hit points.", "is-good");
+    });
+  }
+},
+{
+  title:"Sanity",
+  keeper:"This is the part that makes it Call of Cthulhu. When you see something your mind cannot file away, you make a Sanity roll. I will say something like “Sanity, one slash one D eight.” Roll under your Sanity and you lose the small number. Roll over it and you lose the big one.",
+  watch:"When someone fails a Sanity roll you get to dictate one involuntary action: a scream, a freeze, a dropped lantern. Keep it to one beat and hand control straight back to them.",
+  body:[
+    "A Sanity loss is written as two numbers with a slash, like 1 slash 1D8.",
+    "Roll under your current Sanity and you lose the first, smaller amount. Roll over and you lose the second.",
+    "Your practice Sanity is 60.",
+    "If one roll costs you 5 or more Sanity, you then roll against your Intelligence. Passing that roll is the bad outcome: it means you understood exactly what you were looking at, and you go temporarily insane for 1D10 hours.",
+    "Sanity is slow to get back. It is meant to be a long slide, not a health bar."
+  ],
+  build:function(c){
+    tBtn(c, "Make a Sanity roll, 1 slash 1D8", "Make a practice Sanity roll for 1 slash 1D8", function(){
+      const r = d100(0);
+      const passed = r.total <= tSAN;
+      const loss = passed ? 1 : rollDice("1D8");
+      const before = tSAN;
+      tSAN = Math.max(0, tSAN - loss);
+      let d = "Rolled " + r.total + " against Sanity " + before + ". " +
+        (passed ? "Under, so the lesser loss. " : "Over, so the greater loss. ") +
+        "You lose " + loss + " Sanity and are now on " + tSAN + ".";
+      if(loss >= 5) d += " That is 5 or more at once, so in a real game you would now roll against Intelligence.";
+      tres(passed ? "Held on" : "Shaken", d, passed ? "is-good" : "is-warn");
+    }, true);
+    tBtn(c, "Back to full Sanity", "Reset practice Sanity to 60", function(){
+      tSAN = PRACTICE.san;
+      tres("Steadied", "Back to 60 practice Sanity.", "is-good");
+    });
+  }
+},
+{
+  title:"A round of combat",
+  keeper:"Combat runs in DEX order, highest first. On your turn you act. When something attacks you, you choose how to answer: dodge, or fight back. That choice is the whole of combat, so make sure they understand it before anything is at stake.",
+  watch:"The thing they must grasp: dodging is safe, fighting back is greedy. A tie goes to the dodger, but not to the counter-attacker.",
+  body:[
+    "If you dodge, you need to match or beat the attacker's level of success. A tie goes to you. You take no damage, but you deal none either.",
+    "If you fight back, you must actually beat their level. Do that and you avoid the blow and deal damage instead. Fall short and you get hit.",
+    "So dodging is the safe answer and fighting back is the greedy one.",
+    "Against most things in this game, running is better than either. Try both below: something is lunging at you."
+  ],
+  build:function(c){
+    function resolve(mode){
+      const a = d100(0), aLvl = levelOf(a.total, PRACTICE.fighting + 5);
+      const skill = (mode === "dodge") ? PRACTICE.dodge : PRACTICE.fighting;
+      const dName = (mode === "dodge") ? "Dodge" : "Fighting";
+      const dR = d100(0), dLvl = levelOf(dR.total, skill);
+      const win = (mode === "dodge") ? (RANK[dLvl] >= RANK[aLvl]) : (RANK[dLvl] > RANK[aLvl]);
+      let head, tail;
+      if(mode === "dodge"){
+        head = win ? "You dodge it" : "It hits you";
+        tail = win ? " You matched or beat it, so you take nothing."
+                   : " It beat your level, so you take the damage.";
+      } else {
+        head = win ? "You fight it off and hit back" : "It hits you";
+        tail = win ? " You beat its level, so you avoid the blow and deal damage."
+                   : " Fighting back means you had to beat it outright, and you did not.";
+      }
+      tres(head, "It attacked and got " + aLvl.toLowerCase() + " on " + a.total + ". You rolled " +
+        dR.total + " against " + dName + " " + skill + " for " + dLvl.toLowerCase() + "." + tail,
+        win ? "is-good" : "is-bad");
+    }
+    tBtn(c, "Dodge it", "Dodge the attack. A tie goes to you.", function(){ resolve("dodge"); }, true);
+    tBtn(c, "Fight back", "Fight back. You must beat the attacker's level outright.", function(){ resolve("fight"); });
+  }
+},
+{
+  title:"You are ready",
+  keeper:"That is the whole system. Everything else we pick up as we go. Now let me tell you why you are all in the same room.",
+  watch:"Go straight into the premise and Handout 1 while the energy is up. Do not review.",
+  body:[
+    "That is genuinely all of it: skill rolls, three levels of success, pushing, bonus and penalty dice, Luck, damage, Sanity, and a round of combat.",
+    "Anything you forget is on the Quick rules reminder screen, and the Keeper has the rest.",
+    "Now choose your investigator, and we will begin."
+  ],
+  build:function(c){
+    tBtn(c, "Choose my investigator", "Leave the tutorial and choose an investigator", function(){
+      go("choose");
+    }, true);
+    tBtn(c, "Start the tutorial again", "Go back to step 1", function(){
+      tStep = 0; tHP = PRACTICE.hpMax; tSAN = PRACTICE.san; renderStep(true);
+    });
+  }
+}
+];
+
+function renderStep(moveFocus){
+  const L = LESSONS[tStep];
+  document.getElementById("tut-h").textContent = L.title;
+  document.getElementById("tut-progress").textContent =
+    "Step " + (tStep + 1) + " of " + LESSONS.length + ".";
+
+  const body = document.getElementById("tut-body");
+  body.innerHTML = "";
+  L.body.forEach(function(t){
+    const p = document.createElement("p");
+    p.textContent = t;
+    body.appendChild(p);
+  });
+
+  const tryWrap = document.getElementById("tut-try");
+  tryWrap.innerHTML = "";
+  if(L.build){
+    const h = document.createElement("h3");
+    h.textContent = "Try it";
+    tryWrap.appendChild(h);
+    L.build(tryWrap);
+  }
+
+  document.getElementById("res5-v").textContent = "Nothing yet";
+  document.getElementById("res5-d").textContent = "Nothing in this tutorial touches your real investigator.";
+  document.getElementById("res5").className = "res";
+
+  const prev = document.getElementById("tut-prev");
+  const next = document.getElementById("tut-next");
+  prev.disabled = (tStep === 0);
+  prev.setAttribute("aria-label", tStep === 0 ? "Previous step, unavailable, you are on step 1"
+                                              : "Previous step, back to step " + tStep);
+  next.disabled = (tStep === LESSONS.length - 1);
+  next.textContent = (tStep === LESSONS.length - 1) ? "That is the last step" : "Next step";
+  next.setAttribute("aria-label", (tStep === LESSONS.length - 1)
+    ? "You have reached the last step"
+    : "Next step, on to step " + (tStep + 2) + ", " + LESSONS[tStep + 1].title);
+
+  if(moveFocus) document.getElementById("tut-h").focus();
+}
+
+document.getElementById("tut-next").addEventListener("click", function(){
+  if(tStep < LESSONS.length - 1){ tStep++; renderStep(true); }
+});
+document.getElementById("tut-prev").addEventListener("click", function(){
+  if(tStep > 0){ tStep--; renderStep(true); }
+});
+// The tutorial can be entered before an investigator exists, so leave sensibly.
+document.getElementById("tut-leave").addEventListener("click", function(){
+  go(inv() ? "sheet" : "home");
+});
+
+function buildKeeperScript(){
+  const body = document.getElementById("ktut-body");
+  body.innerHTML = "";
+  LESSONS.forEach(function(L, i){
+    const wrap = document.createElement("div");
+    wrap.className = "panel";
+    const h = document.createElement("h3");
+    h.textContent = "Step " + (i + 1) + ". " + L.title;
+    h.style.marginTop = "0";
+    wrap.appendChild(h);
+
+    const say = document.createElement("p");
+    say.innerHTML = "<strong>Say:</strong> ";
+    say.appendChild(document.createTextNode(L.keeper));
+    wrap.appendChild(say);
+
+    if(L.build){
+      const doing = document.createElement("p");
+      doing.className = "kv";
+      doing.textContent = "They then tap the Try it buttons on their own screen. Wait for everyone.";
+      wrap.appendChild(doing);
+    }
+
+    const watch = document.createElement("p");
+    watch.className = "note";
+    watch.textContent = L.watch;
+    wrap.appendChild(watch);
+
+    body.appendChild(wrap);
+  });
+}
+
+/* ---------------- run the session ---------------- */
+
+// Rendered in full inside each scene as well as on the reference screen, on the
+// assumption the Keeper remembers nothing and should never have to navigate away
+// in the middle of a conversation.
+const NPCS = {
+knott:{
+  name:"Steven Knott", role:"The landlord who hires them",
+  sounds:"Fast, and slightly too much of it. He fills his own silences.",
+  wants:"The house off his books without ever having to say the word haunted out loud.",
+  manner:"He keeps almost saying the important thing and then not saying it. Starts a sentence about the previous tenants, changes his mind, moves on. Straightens things on the desk.",
+  hook:"He hands them the job, the keys and Handout 1. He inherited the place recently and has been unable to rent or sell it. He genuinely does not know what is in there — he is embarrassed, not sinister. Keep him in your back pocket: he is the replacement investigator if someone dies, and in one ending he is the one who dies.",
+  lines:["It is structurally sound. I want to be clear on that. Structurally there is nothing wrong with the place at all.",
+         "The family that had it last — the Macarios — they had some trouble. I would rather you formed your own impression.",
+         "Twenty dollars a day, and I am not going to ask you for receipts."],
+  responds:[
+    {to:"Asked directly whether it is haunted", how:"He gets brisk and businesslike. That is precisely the word he has been avoiding."},
+    {to:"Sympathy", how:"He admits he has not slept properly, and that it is the money keeping him awake, and then looks embarrassed about that."}
+  ]
+},
+arty:{
+  name:"Arty Wilmot", role:"Editor at the Boston Globe, guards the clippings morgue",
+  sounds:"Slow and self-important, leaving gaps for you to be impressed in.",
+  wants:"To be treated as a significant man. The morgue is the only power he has and he is going to enjoy it.",
+  manner:"He repeats your own words back at you as though holding them up to the light. He never quite says no — he says that is not how we do things.",
+  hook:"He is the gate on Handout 2. Nothing else. He is preordained unhelpful, so do not roll for his reaction — the players have to work on him.",
+  lines:["The clippings files are not a public library.",
+         "Research. You want to conduct research. And who exactly are you with?",
+         "I would have to ask. I would have to ask several people."],
+  responds:[
+    {to:"Charm", how:"Thaws slowly. He would rather be liked than obeyed, and almost nobody tries."},
+    {to:"Intimidate", how:"Calls the bluff, but it is nervous bluster. A failed push has him shouting for two maintenance men."},
+    {to:"Persuade", how:"The hardest for him to refuse, because refusing out loud would require him to give a reason."},
+    {to:"Fast Talk", how:"He half believes it, then covers by implying he knew all along."}
+  ]
+},
+ruth:{
+  name:"Ruth Blake", role:"Records keeper in the Globe morgue",
+  sounds:"Warm and unhurried. She talks while she works and never stops moving.",
+  wants:"Company. Nobody comes down here.",
+  manner:"Narrates her own filing. Now that will be under the street, not the family, people always get that wrong.",
+  hook:"No rolls needed with her. She is the relief after Arty. If anyone is friendly she volunteers that the Globe files stop dead at a fire in 1878 — which quietly tells them why there is nothing earlier here, and points them at the Hall of Records.",
+  lines:["Anything before seventy-eight and you are wasting an afternoon. We had a fire.",
+         "You are the first people down here since March. I count.",
+         "Filed by street, not by name. The house outlives the family, that is the way of it."]
+},
+recordsclerk:{
+  name:"The Hall of Records clerk", role:"Counter clerk",
+  sounds:"Flat, literal, unhurried. Answers exactly the question asked and no more.",
+  wants:"To finish his shift without an incident.",
+  manner:"Does not look up until addressed as a person rather than as a machine. Then he is perfectly decent.",
+  hook:"He is a signpost. If they are courteous to him — or make a Law roll — he tells them serious crimes went to the county, commonwealth or federal courts, and that arrest records live at the Central Police Station. That is what moves them to Location 5.",
+  lines:["Civil matters, this counter. Criminal, that is not us.",
+         "Nineteen twelve. There is a reference. The file itself is not here.",
+         "If it was serious it went higher. And if officers were involved, that is Central."]
+},
+debrun:{
+  name:"Kim Debrun", role:"Court clerk, and an old contact",
+  sounds:"Quick and amused, treating them like old friends from the first sentence.",
+  wants:"Depends entirely on the concealed Law roll — and the players must not be able to tell which one they got.",
+  manner:"Both versions open identically. That is the whole trick. The divergence is a single beat of hesitation before the price is named.",
+  hook:"Kim is the Law route to Handout 8. Roll the Law check where they cannot see it and never tell them the result. On a success Kim is warm and simply hands the file over. On a failure Kim takes a bribe, then reneges and denies ever having met them.",
+  lines:["Corbitt. God, yes. That file is a mess, but it is a mess I know.",
+         "It is not that I cannot. It is that there is a process. And processes can be — shortened.",
+         "I do not know what you are talking about, and I would not say that name again in this building."]
+},
+dooley:{
+  name:"Mr. Dooley", role:"Sells cigars and newspapers on the corner",
+  sounds:"Fast and loud, and he never finishes one story before starting the next.",
+  wants:"An audience, and to sell you something while he has one.",
+  manner:"Interrupts himself to greet people passing, then picks up mid-sentence exactly where he left off. Do this two or three times and your wife will know Dooley by the interruptions alone.",
+  hook:"He is the town crier of this scenario: the Macario history, and the location of the chapel. He also gives the house its name — nobody round here calls it the Macario house, they call it the Corbitt house, which is the first hint that the building belongs to somebody other than whoever pays rent.",
+  lines:["The Corbitt house, that is what we call it. Nobody has ever called it the Macario house.",
+         "Morning, Sal. — Where was I. The father. Serious accident, and then not right after.",
+         "Burning eyes, he said. That is what he kept saying. Burning eyes."],
+  responds:[
+    {to:"Good reaction (rolled under APP or Credit Rating)", how:"All six facts come out in a rush, barely prompted."},
+    {to:"Poor reaction", how:"Short answers, and he keeps breaking off to serve other customers. Someone else can try Charm, Fast Talk, Persuade or Intimidate."}
+  ],
+  notes:["He exaggerates and he gossips. Not everything he says has to be true — that is your licence to improvise him freely."]
+},
+vittorio:{
+  name:"Vittorio Macario", role:"The father, at Roxbury Sanitarium, quite mad",
+  sounds:"Long silence, then suddenly too loud, and aimed slightly past whoever is speaking.",
+  wants:"Nothing you can reach. He is not in the conversation.",
+  manner:"Holds a bible against his chest with both arms, the way you hold something that is trying to get away. Does not register that people are there until, abruptly, he does.",
+  hook:"He carries the single most important clue in the scenario. At some point he opens the bible at random, points at the page, and delivers the line about the devil and his own weapon. It is not a real verse. It means Corbitt can be killed with his own dagger.",
+  lines:["By his own weapon is the devil worsted!"],
+  notes:["Say it once. Do not repeat it, do not explain it, do not lean on it. If a player asks him to say it again he says something else entirely.",
+         "Play the silences. Let them get uncomfortable before he speaks. The discomfort is the scene."]
+},
+gabriela:{
+  name:"Gabriela Macario", role:"The mother, at Roxbury, lucid",
+  sounds:"Quiet, careful and controlled. She has rehearsed how to say this without sounding mad.",
+  wants:"To be believed. And not to have to think about it any longer than necessary.",
+  manner:"She says it and never he. Precise about small details, vague and reluctant about the thing itself.",
+  hook:"She confirms the haunting is real and personal: a presence that leaned over her at night, threw objects when angry, and above all hated her husband. That last part matters — it tells the players this thing has preferences, which is far worse than a thing that simply attacks.",
+  lines:["It would be at the end of the bed. Not standing. Leaning.",
+         "When it was angry the dishes would go across the room. I stopped keeping anything on the shelves.",
+         "It did not want me. It wanted Vittorio.",
+         "You will say I was ill. I was not ill then."],
+  notes:["End the interview quickly. Her distress should be visible and should make the players feel bad about pressing. That is the scene doing its job, not a failure of it."]
+},
+boys:{
+  name:"The Macario boys", role:"The children, with relatives in Baltimore",
+  sounds:"One of them answers. The other does not. The one who talks keeps checking with his brother.",
+  wants:"To go home, to parents who are not coming back.",
+  manner:"Careful, polite, and watching your face to see whether they are in trouble.",
+  hook:"There is nothing here to learn — they know only that they had nightmares of a strange man with burning eyes. The value is entirely emotional, and it confirms Dooley. Optional scene; skip it if the evening is running long.",
+  lines:["We had the same dream. That happens, though. With brothers. Doesn't it?",
+         "A man with burning eyes. But not — he was not burning. His eyes were."]
+},
+corbitt:{
+  name:"Walter Corbitt", role:"The undead sorcerer beneath the house",
+  sounds:"He does not breathe, so he does not pause where a person pauses. Run a long line all the way through in one go, with no breath in the middle. It is unsettling out of all proportion to how simple it is.",
+  wants:"Amusement, division, and any Mythos knowledge they have carried into his house.",
+  manner:"Never plain speech — he growls, screeches, cackles and mocks. He is full of malice and will actively try to turn the investigators against one another.",
+  hook:"He has been aware of them since they crossed the threshold. He is not a beast; he is a spiteful, intelligent old man who has had a very long time to get bored. He would rather watch them turn on each other than kill them.",
+  lines:["Ohhh. You brought me a book.",
+         "Which of you was it who wanted to see a ghost? Was it you? I think it was you.",
+         "Knock the wall down. Go on. I have been waiting all week."],
+  notes:["Taunt them using their own backstory entries — he has had time to read them. The Author longs to see real evidence of the spirit world; the Private Investigator believes ghosts are stories made up to frighten children; the Graduate Student's father vanished on an expedition; the Professor has a partner and a young daughter. Every one of those is an open wound. Use them by name.",
+         "Sunlight pains him and is too bright for him to see by. He drinks blood, though he does not need to — he simply prefers it."]
+}
+};
+
+const DISCOVERIES = [
+  {id:"name",    label:"Walter Corbitt owned the house"},
+  {id:"chapel",  label:"The Chapel of Contemplation and the 1912 raid"},
+  {id:"buried",  label:"Corbitt was buried in the basement"},
+  {id:"dagger",  label:"“By his own weapon is the devil worsted”"},
+  {id:"symbol",  label:"The painted symbol at the chapel"},
+  {id:"carving", label:"“Chapel of Contemplation” carved in the crawl space"},
+  {id:"knife",   label:"The floating knife"}
+];
+
+// Read-aloud text is written for this table rather than lifted from the book —
+// the book itself tells you to paraphrase. It leans on sound, smell and
+// temperature ahead of sight, which serves a blind player and makes the
+// house creepier for everyone.
+const SCENES = [
+{
+  id:"open", label:"Opening: the job", npcs:["knott"],
+  readAloud:[{cue:"In Knott's office", text:"It is a grey Tuesday in Boston, 1923, and you are sitting in a landlord's office that smells of pipe smoke and wet wool. Steven Knott talks quickly, the way a man does when he has decided not to say the important part. He has a house he cannot rent. He has twenty dollars a day for anyone willing to find out why. And he has a ring of keys on the desk between you, which he has not yet pushed across."}],
+  ask:["Go round the table: who is your investigator, and what do they do?",
+       "You have keys, an address, and twenty dollars in advance. Where do you start?"],
+  handouts:[1],
+  notes:["Most groups want to drive straight to the house. Steer them into research first, and give them the in-character reason: they are professionals, and this is what professionals do.",
+         "Knott inherited the place recently and wants to sell or rent it. He is not hiding anything sinister — he is just embarrassed."]
+},
+{
+  id:"globe", label:"Location 2: The Boston Globe", npcs:["arty","ruth"],
+  readAloud:[
+    {cue:"On arrival", text:"The presses are running somewhere below street level. You feel them through the soles of your shoes before you hear them: a slow, heavy thudding, like something very large breathing in the basement. The clerk has to raise his voice over it."},
+    {cue:"If they reach the morgue", text:"Ruth Blake takes you down a flight of iron stairs into air that is hot and dry and thick with the smell of old paper. Somewhere behind the shelves a boiler ticks. The clippings are filed by street address."}
+  ],
+  ask:["Who is doing the talking?",
+       "How are you playing this — friendly, forceful, reasonable, or are you going to lie to him?"],
+  callFor:["Charm if they are being friendly. Intimidate if aggressive. Persuade if reasoning. Fast Talk if conning him. Regular difficulty."],
+  success:"Arty backs down however suits you, and they get into the morgue. Hand over Handout 2 — do not make them roll again for it.",
+  failure:"He puffs himself up and tells them to leave. They may push by pressing him, and may switch tactics. A failed push must escalate past being asked to leave: he calls two maintenance men over.",
+  handouts:[2],
+  finds:["name"],
+  notes:["Arty Wilmot is preordained unhelpful, so do not roll for his reaction. Play the pomposity up so they enjoy beating it.",
+         "Regular difficulty, not Hard: a newspaper editor is not a professional-grade social operator.",
+         "Ruth Blake will mention, if befriended, that the files stop at a fire in 1878."]
+},
+{
+  id:"library", label:"Location 3: The Central Library",
+  readAloud:[{cue:"On arrival", text:"The reading room swallows sound. Every cough is somebody else's, somewhere far off, and the whole place smells faintly of dust and floor polish. A clock you cannot see marks the half hours."}],
+  ask:["How long are you willing to spend on this? Each go at it costs you half a day."],
+  callFor:["Library Use, one roll per half-day, per investigator."],
+  success:"Each success hands out the next document in order: 3, then 4, then 5, then 6.",
+  failure:"No push needed. They can simply try again — but every attempt is another half-day gone.",
+  handouts:[3,4,5,6],
+  finds:["name"],
+  notes:["If they spend more than a day here, have Knott telephone to ask how it is going. Time is money.",
+         "This is the safest scene in the scenario. Let them feel competent before the house."]
+},
+{
+  id:"records", label:"Location 4: The Hall of Records", npcs:["recordsclerk"],
+  readAloud:[{cue:"On arrival", text:"A counter, a bell, and a clerk who does not look up. Behind him the ledgers go back further than the city has been worth recording, bound in something that was once green."}],
+  callFor:["Library Use, same half-day rule as the library."],
+  success:"Handout 7 — the executor of Corbitt's will, and the Chapel of Contemplation.",
+  failure:"They can keep trying at half a day a go.",
+  handouts:[7],
+  finds:["chapel"],
+  notes:["If they look up the Chapel here, the 1912 records are referenced but physically missing.",
+         "A successful Law roll — or simply being courteous to the clerk — points them to the Central Police Station."]
+},
+{
+  id:"police", label:"Location 5: Courts and Central Police Station", npcs:["debrun"],
+  readAloud:[{cue:"On arrival", text:"Wet coats, cigarette smoke, and a bench along one wall holding three men who have all decided not to look at each other. Somebody two rooms away is being told off at length."}],
+  ask:["Whose name are you leaning on to get in here?"],
+  callFor:["Law — they know Kim Debrun, a court clerk. Roll this one concealed and do not tell them the result.",
+           "Credit Rating — only works on a success if their score is 75 or more.",
+           "Persuade, Charm, or Fast Talk with a fake identification, which is risky in a police station."],
+  success:"Handout 8: the raid, the seventeen dead cultists, and Pastor Michael Thomas.",
+  failure:"A failed push with Credit Rating, Persuade or Charm earns them police attention — a shakedown, or threats.",
+  handouts:[8],
+  finds:["chapel"],
+  notes:["The concealed Law roll is the good bit. On a success Kim is warm and helpful. On a failure Kim demands a bribe, takes it, then denies ever having met them. Either way they meet Kim — they just do not know which Kim they got."]
+},
+{
+  id:"neighborhood", label:"Location 6: The neighborhood", npcs:["dooley"],
+  readAloud:[{cue:"On the street", text:"New offices have grown up along this block, and the Corbitt house sits between them like a bad tooth: the only house left, its front yard gone to seed. On the corner a man sells cigars and newspapers and has opinions about everyone who passes."}],
+  ask:["Who is going over to talk to him?"],
+  callFor:["Roll 1D100 against that investigator's APP or Credit Rating for Dooley's reaction. A poor reaction lets someone else try Charm, Fast Talk, Persuade or Intimidate."],
+  notes:["What Dooley gives up, in roughly this order:",
+         "The Macario family moved in a couple of years ago.",
+         "A year later the father had a bad accident, and shortly after that went violently mad.",
+         "He babbled about a haunting shape with burning eyes.",
+         "About a month ago Mrs. Macario went mad as well.",
+         "Both are at Roxbury Sanitarium, a few miles out.",
+         "The children went to relatives down in Baltimore.",
+         "He can point out where the Chapel stood, a few blocks off. He calls the place the Corbitt House.",
+         "Improvise him freely — he is a salesman, he gossips, and not everything he says has to be true."]
+},
+{
+  id:"sanitarium", label:"Location 7: Roxbury Sanitarium", npcs:["vittorio","gabriela","boys"],
+  readAloud:[
+    {cue:"On arrival", text:"Roxbury is quiet in the way that costs money. Somewhere down a corridor a door closes twice — once properly, once by someone checking it was closed."},
+    {cue:"Vittorio", text:"Vittorio Macario is holding a bible against his chest with both arms, the way you would hold something that was trying to get away. He does not seem to know you are there until, quite suddenly, he does."}
+  ],
+  ask:["Do you want to press him, or let him talk?"],
+  finds:["dagger"],
+  notes:["At some point Vittorio opens the bible at random, points at the page, and says: “By his own weapon is the devil worsted.” It is not a real verse. It is the clue that Corbitt can be killed with his own dagger. Say it once, plainly, and move on. Do not sell it.",
+         "Gabriela is lucid and approachable. An evil presence lives in the house. She would wake to find it leaning over her. When angry it threw dishes and objects about the room. Above all it hated Vittorio.",
+         "End the interview quickly — the questions distress her, and that should be visible.",
+         "The boys in Baltimore know nothing except that they miss their parents and had nightmares of a strange man with burning eyes."]
+},
+{
+  id:"chapel", label:"Location 8: The Chapel of Contemplation",
+  readAloud:[
+    {cue:"On arrival", text:"The street bends and narrows and then simply gives up. What is left of the chapel has been weathered down until the stone looks less like ruins than like something the ground pushed up on its own. Greenery has got into all of it."},
+    {cue:"The symbol", text:"On a slumping section of wall, someone has painted three shapes in thick white strokes, arranged so their arms touch and enclose a rough triangle. At the centre of that space is an open eye. The paint is fresh enough that you can still smell it."},
+    {cue:"Near the symbol", text:"While you are close to it, there is a pressure behind your forehead. Not quite a headache. More like a held note you can feel rather than hear. It stops the moment you step away."}
+  ],
+  ask:["Are you going in among the rubble?"],
+  callFor:["Luck rolls as they prowl the ruins — the earth is covering weakened floorboards.",
+           "Anyone who fails Luck makes a Jump roll to get clear.",
+           "Failing Jump is a ten-foot fall into the basement for 1D6 hit points."],
+  failure:"They can push a failed Jump with a last-minute grab for the edge. A failed push is better spent breaking a treasured possession than adding damage.",
+  handouts:[9],
+  finds:["symbol"],
+  notes:["This is very likely the first damage of the evening. Walk them through the tracker on their own devices when it happens — it is a cheap, safe place to learn it."]
+},
+{
+  id:"chapelcellar", label:"Beneath the chapel",
+  readAloud:[
+    {cue:"For anyone who falls", text:"You land badly in a room that has been sealed since before the fire. The air has not moved in decades and tastes of it. Against the far wall, beside a cabinet, two skeletons lie in the rags of silk robes — close together, as though they had chosen the spot."},
+    {cue:"If they find the journal", text:"The journal comes apart as you turn it. One entry has been written slowly, in a careful hand: Walter Corbitt was buried in the basement of his house, in accordance with his wishes, and with the wishes of that one who waits in the dark."}
+  ],
+  callFor:["Spot Hidden to find what is under the cabinet. Pushable with a thorough, time-consuming search."],
+  failure:"A failed push here should cost something small and mundane — a nail through a shoe, a ruined coat.",
+  finds:["buried"],
+  notes:["The cabinet itself holds mouldering church records. Under it: the journal, and the Liber Ivonis.",
+         "The Liber Ivonis is Latin, worm-eaten, and takes three hours to skim. It needs Language (Other) Latin at 50 or more, or a successful roll. It gives +2 Cthulhu Mythos and drops maximum Sanity from 99 to 97.",
+         "If nobody thinks to look under the cabinet, ask for the Spot Hidden anyway. This clue matters."]
+},
+{
+  id:"house", label:"Location 9: The old Corbitt place",
+  readAloud:[{cue:"Outside", text:"The house is brick, and it is lower than the offices that have grown up on either side, so it sits in their shade all day. The curtains are drawn and have been for years. The front door has one good lock and four bolts that are obviously newer than the door. Every window on the ground floor has been nailed shut — and the nail heads are on the inside."}],
+  ask:["Who has the keys? Who is going in first?",
+       "It is going to get dark. Do you have light with you?"],
+  notes:["Let that last detail land: the house was nailed shut from within. Somebody was keeping something in, not out.",
+         "From here on, Corbitt is aware of them. Start seeding noise from the spare bedroom upstairs.",
+         "Describe rooms in a fixed order all evening — exits, then furnishings, then detail. Predictable structure is navigable structure."]
+},
+{
+  id:"ground", label:"The ground floor",
+  readAloud:[
+    {cue:"Entering", text:"The air inside is colder than the street, and completely still. Under the dust there is a sweetish smell you cannot place, and will not want to."},
+    {cue:"The dining room", text:"A long table, seven chairs, and three places set and never used. In the tureen, what was once rice soup has gone to a grey crust."},
+    {cue:"The living room", text:"Ordinary furniture, a radio, shelves of small ornaments. And crosses. Far more crosses than anybody needs, along with images of the Virgin, arranged on every surface that would take them."}
+  ],
+  notes:["Room 1, storage: junk, and a cupboard boarded shut. Forced open it holds three Corbitt diaries in English. Two days to read, +4 Cthulhu Mythos, lose 1D4 Sanity. They contain Summon and Bind Dimensional Shambler, which is not meant to be used here.",
+         "Room 2: old furniture fit for firewood. Room 3, the mud room: coats, galoshes, coal, and a side door with three bolts and two locks.",
+         "Room 6, the kitchen: rat spoor in the larder, and the fuse box. Corbitt has already cut the power to the basement from here, and can cut it again whenever it suits him.",
+         "Note the diaries cost Sanity outright, with no roll. Their app has a button for that."]
+},
+{
+  id:"upper", label:"The upper floor and the bed",
+  readAloud:[
+    {cue:"The landing", text:"The stairs complain, but they hold. Up here the still air has a taste to it."},
+    {cue:"The spare bedroom", text:"A bed frame, bare springs, a dresser. Nobody has used this room in years — and yet it is the only room in the house that feels occupied. Then the smell arrives: thick, sweet and organic, like corn left to rot in the wet."}
+  ],
+  ask:["Who is looking at the window?"],
+  callFor:["Spot Hidden for the investigator at the window. On a success they may Dodge.",
+           "A hit throws them through the window: 1D6+2 hit points.",
+           "Anyone who watches the bed move: Sanity roll, 1 slash 1D4."],
+  notes:["The spare bedroom was Corbitt's own. His influence lingers and he can act here. The rotten-corn smell is your tell that something is about to happen — use it every time.",
+         "What he can do: thumping audible anywhere in the house, blood pooling on the floor or running down a wall, scratching at the pane. Then the bed.",
+         "Pick the target impartially — lowest Luck, or roll. Say aloud who is standing where before you spring it, so the choice reads as fair.",
+         "This can deliver a major wound. If an investigator dies, bring Knott the landlord in for that player.",
+         "Main bedroom: crosses and many candles, a rosary and breviary by the bed. Children's room: two small beds, toys, pictures of aircraft and cowboys."]
+},
+{
+  id:"stairs", label:"The basement stairs",
+  readAloud:[{cue:"At the door", text:"The basement door has a lock and three bolts, and every one of them works from this side only. Beyond it the stairs go down into air that is colder again, and the light switch does nothing at all."}],
+  callFor:["A combined DEX or Climb roll for each investigator descending — one roll, checked against both numbers, either one succeeding."],
+  failure:"On a failure, tell them plainly that going on risks injury. They can stop, or push and risk a 1D6 fall.",
+  notes:["Corbitt can make the stairs move, and will.",
+         "If someone who made it offers to help the next one down, grant a bonus die — but on a failure both fall and both take damage. Shared risk, better odds, real tension. That trade is the best small moment in the scenario; make sure you offer it."]
+},
+{
+  id:"cellar", label:"The basement and the knife",
+  readAloud:[
+    {cue:"At the bottom", text:"Earth floor, and walls lined edge to edge with close-fitted boards, which is not how anybody builds a cellar. Rap on them and some of it comes back hollow."},
+    {cue:"If the knife is found", text:"An old knife with a worked hilt, the blade under a thick coat of rust that is too dark and too even to be rust. The moment it is in a hand, it pulls."}
+  ],
+  callFor:["Spot Hidden in the storage room — an obscure clue, so give nothing on a failure.",
+           "A failed pushed Spot Hidden costs 1D4+2 automatically as a hand catches the blade. No attack roll."],
+  finds:["knife","carving"],
+  notes:["Room 1: tools, pipe, lumber, nails, and a trash can lid — which grants a bonus die on Dodge if someone thinks to hold it up. Room 2: an empty coal bin, chute nailed shut.",
+         "Room 3, behind the boards: a crawl space with “Chapel of Contemplation” carved into the inner wall in irregular scratchy letters. Obvious clue — do not ask for a roll.",
+         "The knife: 1 magic point per round, one attack per round, rolled against Corbitt's POW 90 versus the target's Dodge. 1D4+2, or 6+1D4+2 on an Extreme. Unaware targets get no Dodge and it misses only on 100. Seeing it move is Sanity 1 slash 1D4.",
+         "Holding on to it is an opposed STR against his POW, each round, costing him another magic point."]
+},
+{
+  id:"lair", label:"Corbitt's hiding place", npcs:["corbitt"],
+  readAloud:[
+    {cue:"The pallet", text:"On a pallet in the middle of the crawl space lies a figure something over six feet long. Naked, hairless, and drawn tight, the skin gone the colour and grain of old wood. The eyes are open and far too wide. The gums have shrunk back from the teeth. Around the neck is a chain. And the smell you have been catching all evening is here at its source, sharp and sweet, like rotten corn.",
+     },
+    {cue:"When he moves", text:"He does not sit up so much as decide to. There is no breath in it, and no sound but the chain."}
+  ],
+  callFor:["When he rises: Sanity roll, 1 slash 1D8, from everyone present.",
+           "Anyone losing 5 or more then rolls against INT. Passing that roll is the bad outcome."],
+  corbitt:true,
+  notes:["Combat order by DEX, highest first. A gun already drawn adds 50 to that investigator's DEX. Corbitt acts on DEX 35, or 85 in a round where he casts Dominate.",
+         "He spends 2 magic points to move for five rounds, and is reluctant to move at all unless threatened.",
+         "He has already cast Flesh Ward. Roll 2D6 now for his armour and note it — each point of damage reduces it by one.",
+         "Attacked with Fighting, he fights back with Fighting, including against later attacks in the round. Attacked with Firearms, just roll to hit; he never dives for cover, and point-blank grants a bonus die. The second attacker each round gets a bonus die for outnumbering.",
+         "A successful claw attack means a Luck roll, then delirium and CON loss a day later. Lost CON never returns.",
+         "0 hit points and he crumbles to dust. Stabbed with his own dagger, he turns to ash instantly regardless of spells.",
+         "The table on the floor holds curled papers that look like a horoscope. They crumble at a touch. Leave it unexplained — it is a hook for a later game."]
+},
+{
+  id:"end", label:"Conclusion", npcs:["knott"],
+  readAloud:[{cue:"If they win", text:"Whatever was holding him together stops. The chain drops through where his neck was and lands in a spread of grey dust, and the house is only a house — cold, filthy, and completely ordinary."}],
+  notes:["Each surviving investigator who took part gains 1D6 Sanity.",
+         "They may keep the worm-eaten book. Knott pays their fee plus a 30 dollar bonus, promptly and happily.",
+         "If they win, you may quietly drop the lingering effects of the claw attacks.",
+         "If they report that nothing was wrong, Knott spends a night in the house to check and is stabbed to death in the basement. The investigators are then sought by the police and have to prove their innocence.",
+         "If it went badly: the dead may be reanimated to repair the basement walls before crumbling; the insane flee into the night.",
+         "Burning the place down without confronting him is a legitimate ending — followed by an arson charge.",
+         "Ask each player to roll for skill increases: any ticked skill, roll over its value to gain 1D10 points.",
+         "Threads for later: the fresh paint on the chapel wall, the 1912 cover-up, and that horoscope."]
+}
+];
+
+function runState(){
+  if(!S.run) S.run = {scene:0, handouts:{}, found:{}, corbitt:{hp:16, mp:18, armor:0}};
+  if(!S.run.corbitt) S.run.corbitt = {hp:16, mp:18, armor:0};
+  return S.run;
+}
+
+function runProgressLine(){
+  const r = runState();
+  const given = Object.keys(r.handouts).filter(function(k){ return r.handouts[k]; }).length;
+  const found = Object.keys(r.found).filter(function(k){ return r.found[k]; }).length;
+  return "Scene " + (r.scene + 1) + " of " + SCENES.length + ". " + given +
+         " of 9 handouts given, " + found + " of " + DISCOVERIES.length + " key discoveries made.";
+}
+
+function block(parent, heading, cls){
+  const h = document.createElement("h3");
+  h.textContent = heading;
+  if(cls) h.className = cls;
+  parent.appendChild(h);
+}
+
+// One renderer, used both inside a scene and on the reference screen, so the
+// scene never shows a thinner version than the reference.
+function renderNPC(parent, id){
+  const n = NPCS[id];
+  if(!n) return;
+  const wrap = document.createElement("div");
+  wrap.className = "panel";
+
+  const h = document.createElement("h3");
+  h.textContent = n.name;
+  h.style.marginTop = "0";
+  wrap.appendChild(h);
+
+  const role = document.createElement("p");
+  role.className = "kv";
+  role.textContent = n.role;
+  wrap.appendChild(role);
+
+  function field(label, text){
+    const p = document.createElement("p");
+    const b = document.createElement("strong");
+    b.textContent = label + " ";
+    p.appendChild(b);
+    p.appendChild(document.createTextNode(text));
+    wrap.appendChild(p);
+  }
+  field("Sounds like:", n.sounds);
+  field("Wants:", n.wants);
+  field("Mannerisms:", n.manner);
+  field("Why they matter:", n.hook);
+
+  if(n.lines && n.lines.length){
+    const lh = document.createElement("h4");
+    lh.textContent = "Lines you can just say";
+    wrap.appendChild(lh);
+    const ul = document.createElement("ul");
+    n.lines.forEach(function(l){
+      const li = document.createElement("li");
+      li.textContent = "“" + l + "”";
+      ul.appendChild(li);
+    });
+    wrap.appendChild(ul);
+  }
+
+  if(n.responds && n.responds.length){
+    const rh = document.createElement("h4");
+    rh.textContent = "How they react";
+    wrap.appendChild(rh);
+    const dl = document.createElement("dl");
+    n.responds.forEach(function(r){
+      const dt = document.createElement("dt"); dt.textContent = r.to;
+      const dd = document.createElement("dd"); dd.textContent = r.how;
+      dl.appendChild(dt); dl.appendChild(dd);
+    });
+    wrap.appendChild(dl);
+  }
+
+  (n.notes || []).forEach(function(t){
+    const p = document.createElement("p");
+    p.className = "note";
+    p.textContent = t;
+    wrap.appendChild(p);
+  });
+
+  parent.appendChild(wrap);
+}
+
+function buildQuick(){
+  const tbl = document.getElementById("kq-thresholds");
+  if(tbl.rows.length > 1) return;   // generated once
+  const head = tbl.insertRow();
+  ["Skill","Hard","Extreme","Skill","Hard","Extreme"].forEach(function(x){
+    const th = document.createElement("th"); th.textContent = x; head.appendChild(th);
+  });
+  // two value columns side by side so the whole 5–95 range fits on one screen
+  for(let v = 5; v <= 50; v += 5){
+    const r = tbl.insertRow();
+    [v, half(v), fifth(v)].forEach(function(x){ r.insertCell().textContent = x; });
+    const w = v + 50;
+    if(w <= 95){ [w, half(w), fifth(w)].forEach(function(x){ r.insertCell().textContent = x; }); }
+    else { r.insertCell(); r.insertCell(); r.insertCell(); }
+  }
+}
+
+document.getElementById("kq-print").addEventListener("click", function(){ window.print(); });
+
+function buildNPCs(){
+  const body = document.getElementById("knpc-body");
+  body.innerHTML = "";
+  Object.keys(NPCS).forEach(function(id){ renderNPC(body, id); });
+}
+
+function buildRun(){
+  const r = runState();
+  const sc = SCENES[r.scene];
+  document.getElementById("krun-h").textContent = sc.label;
+  document.getElementById("krun-progress").textContent = runProgressLine();
+
+  const jump = document.getElementById("krun-jump");
+  if(jump.options.length !== SCENES.length){
+    jump.innerHTML = "";
+    SCENES.forEach(function(s, i){
+      const o = document.createElement("option");
+      o.value = String(i); o.textContent = (i + 1) + ". " + s.label;
+      jump.appendChild(o);
+    });
+  }
+  jump.value = String(r.scene);
+
+  const body = document.getElementById("krun-body");
+  body.innerHTML = "";
+
+  (sc.readAloud || []).forEach(function(ra){
+    const wrap = document.createElement("div");
+    wrap.className = "panel";
+    const h = document.createElement("h3");
+    h.textContent = "Read aloud — " + ra.cue;
+    h.style.marginTop = "0";
+    wrap.appendChild(h);
+    const p = document.createElement("p");
+    p.textContent = ra.text;
+    p.style.fontSize = "1.1rem";
+    wrap.appendChild(p);
+    body.appendChild(wrap);
+  });
+
+  if(sc.npcs && sc.npcs.length){
+    block(body, sc.npcs.length > 1 ? "Who is here, and how to play them" : "Who is here, and how to play them");
+    sc.npcs.forEach(function(id){ renderNPC(body, id); });
+  }
+
+  if(sc.ask){
+    block(body, "Ask them");
+    const ul = document.createElement("ul");
+    sc.ask.forEach(function(a){
+      const li = document.createElement("li"); li.textContent = a; ul.appendChild(li);
+    });
+    body.appendChild(ul);
+  }
+
+  if(sc.callFor){
+    block(body, "Call for");
+    const ul = document.createElement("ul");
+    sc.callFor.forEach(function(a){
+      const li = document.createElement("li"); li.textContent = a; ul.appendChild(li);
+    });
+    body.appendChild(ul);
+  }
+
+  if(sc.success){
+    block(body, "On success");
+    const p = document.createElement("p"); p.textContent = sc.success; body.appendChild(p);
+  }
+  if(sc.failure){
+    block(body, "On failure");
+    const p = document.createElement("p"); p.textContent = sc.failure; body.appendChild(p);
+  }
+
+  if(sc.handouts && sc.handouts.length){
+    block(body, "Handouts from this scene");
+    sc.handouts.forEach(function(n){
+      const h = HANDOUTS.find(function(x){ return x.n === n; });
+      const given = !!r.handouts[n];
+      const b = document.createElement("button");
+      b.textContent = (given ? "Given: " : "Not yet given: ") + "Handout " + n + " — " + h.title;
+      b.setAttribute("aria-pressed", String(given));
+      b.className = "flagbtn";
+      if(given) b.style.borderColor = "var(--good)";
+      b.addEventListener("click", function(){
+        r.handouts[n] = !r.handouts[n]; save(); buildRun();
+        announcePolite("Handout " + n + (r.handouts[n] ? " marked as given." : " marked as not given."));
+      });
+      body.appendChild(b);
+    });
+  }
+
+  if(sc.finds && sc.finds.length){
+    block(body, "Key discoveries here");
+    sc.finds.forEach(function(id){
+      const d = DISCOVERIES.find(function(x){ return x.id === id; });
+      const got = !!r.found[id];
+      const b = document.createElement("button");
+      b.textContent = (got ? "Found: " : "Not yet found: ") + d.label;
+      b.setAttribute("aria-pressed", String(got));
+      if(got) b.style.borderColor = "var(--good)";
+      b.addEventListener("click", function(){
+        r.found[id] = !r.found[id]; save(); buildRun();
+      });
+      body.appendChild(b);
+    });
+  }
+
+  if(sc.corbitt) buildCorbittTracker(body);
+
+  if(sc.notes && sc.notes.length){
+    block(body, "Keeper notes");
+    sc.notes.forEach(function(n){
+      const p = document.createElement("p");
+      p.className = "note";
+      p.textContent = n;
+      body.appendChild(p);
+    });
+  }
+
+  const prev = document.getElementById("krun-prev");
+  const next = document.getElementById("krun-next");
+  prev.disabled = (r.scene === 0);
+  next.disabled = (r.scene === SCENES.length - 1);
+  next.textContent = next.disabled ? "Last scene" : "Next scene";
+}
+
+function buildCorbittTracker(parent){
+  const c = runState().corbitt;
+  block(parent, "Corbitt, live");
+  const wrap = document.createElement("div");
+  wrap.className = "track";
+  const h = document.createElement("h3");
+  h.textContent = "Hit points " + c.hp + " of 16. Magic points " + c.mp + " of 18. Flesh Ward armour " + c.armor + ".";
+  wrap.appendChild(h);
+
+  function ctl(label, fn){
+    const b = document.createElement("button");
+    b.textContent = label;
+    b.className = "small";
+    b.style.marginRight = ".5rem";
+    b.addEventListener("click", function(){ fn(); save(); buildRun(); });
+    return b;
+  }
+  const row = document.createElement("div"); row.className = "row";
+  row.appendChild(ctl("HP minus 1", function(){ c.hp = Math.max(0, c.hp - 1); }));
+  row.appendChild(ctl("HP minus 5", function(){ c.hp = Math.max(0, c.hp - 5); }));
+  row.appendChild(ctl("MP minus 1", function(){ c.mp = Math.max(0, c.mp - 1); }));
+  row.appendChild(ctl("MP minus 2", function(){ c.mp = Math.max(0, c.mp - 2); }));
+  row.appendChild(ctl("MP plus 1 (an hour passes)", function(){ c.mp = Math.min(18, c.mp + 1); }));
+  wrap.appendChild(row);
+
+  const row2 = document.createElement("div"); row2.className = "row";
+  row2.appendChild(ctl("Roll 2D6 Flesh Ward", function(){ c.armor = rollDice("2D6"); }));
+  row2.appendChild(ctl("Armour minus 1", function(){ c.armor = Math.max(0, c.armor - 1); }));
+  row2.appendChild(ctl("Reset Corbitt", function(){ c.hp = 16; c.mp = 18; c.armor = 0; }));
+  wrap.appendChild(row2);
+
+  const p = document.createElement("p");
+  p.className = "sub";
+  p.style.margin = ".5rem 0 0";
+  p.textContent = c.hp === 0
+    ? "He is down. He crumbles into dust and does not come back."
+    : "Damage hits the Flesh Ward first, one point of armour per point of damage. Only what gets through comes off his hit points.";
+  wrap.appendChild(p);
+  parent.appendChild(wrap);
+}
+
+document.getElementById("krun-next").addEventListener("click", function(){
+  const r = runState();
+  if(r.scene < SCENES.length - 1){ r.scene++; save(); buildRun(); document.getElementById("krun-h").focus(); }
+});
+document.getElementById("krun-prev").addEventListener("click", function(){
+  const r = runState();
+  if(r.scene > 0){ r.scene--; save(); buildRun(); document.getElementById("krun-h").focus(); }
+});
+document.getElementById("krun-jump").addEventListener("change", function(){
+  const r = runState();
+  r.scene = parseInt(this.value, 10) || 0; save(); buildRun();
+});
+
+function buildRunState(){
+  const r = runState();
+  const body = document.getElementById("krs-body");
+  body.innerHTML = "";
+
+  const p = document.createElement("p");
+  p.textContent = runProgressLine();
+  body.appendChild(p);
+
+  block(body, "Handouts");
+  HANDOUTS.forEach(function(h){
+    const given = !!r.handouts[h.n];
+    const b = document.createElement("button");
+    b.textContent = (given ? "Given: " : "Not yet: ") + "Handout " + h.n + " — " + h.title;
+    b.setAttribute("aria-pressed", String(given));
+    if(given) b.style.borderColor = "var(--good)";
+    b.addEventListener("click", function(){
+      r.handouts[h.n] = !r.handouts[h.n]; save(); buildRunState();
+    });
+    body.appendChild(b);
+  });
+
+  block(body, "Key discoveries");
+  DISCOVERIES.forEach(function(d){
+    const got = !!r.found[d.id];
+    const b = document.createElement("button");
+    b.textContent = (got ? "Found: " : "Not yet: ") + d.label;
+    b.setAttribute("aria-pressed", String(got));
+    if(got) b.style.borderColor = "var(--good)";
+    b.addEventListener("click", function(){
+      r.found[d.id] = !r.found[d.id]; save(); buildRunState();
+    });
+    body.appendChild(b);
+  });
+
+  const missing = DISCOVERIES.filter(function(d){ return !r.found[d.id]; });
+  const note = document.createElement("p");
+  note.className = "note";
+  note.textContent = missing.length === 0
+    ? "They have everything. They can go into that basement knowing exactly what is down there."
+    : "Still outstanding: " + missing.map(function(d){ return d.label; }).join("; ") + ".";
+  body.appendChild(note);
+
+  const crit = document.createElement("p");
+  crit.className = "note";
+  crit.textContent = "Only two of these really matter before the climax: that Corbitt is buried in the basement, and the line about his own weapon. If they are heading for the house without those, find a way to put them back in front of them.";
+  body.appendChild(crit);
+}
+
+document.getElementById("krun-reset").addEventListener("click", function(){
+  S.run = {scene:0, handouts:{}, found:{}, corbitt:{hp:16, mp:18, armor:0}};
+  save(); buildRunState();
+  announce("Session reset. Back to the opening scene, no handouts given.");
+});
+
+/* ---------------- boot ---------------- */
+
+load();
+buildChoose();
+buildSanSelect();
+buildModRow();
+
+if(S.charId && inv()){
+  if(!S.cur || S.cur.hpMax === undefined) initChar(S.charId);
+  go(S.mode === "keeper" ? "keeper" : "sheet");
+} else {
+  go("home");
+}
+</script>
+</body>
+</html>
