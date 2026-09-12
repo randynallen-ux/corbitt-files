@@ -2023,6 +2023,16 @@ function buildKeeperScript(){
 const NPCS = {
 knott:{
   name:"Steven Knott", role:"The landlord who hires them",
+  asks:[
+    {q:"Is the house haunted?", a:"A pause, then brisk. “I am not paying you twenty dollars a day for an opinion I could get in a tavern. I am paying you to go and look.” He will not say the word."},
+    {q:"What happened to the Macario family?", a:"“The husband was taken ill. Then the wife. The children went to relatives.” He believes every word of that. It is what the agent told him."},
+    {q:"Have you been inside yourself?", a:"“Once. In daylight.” If pressed on why only once, he changes the subject to the roof."},
+    {q:"Has anyone died in there?", a:"“Not while I have owned it.” Technically true, and he knows it is a lawyer's answer."},
+    {q:"How did you come by it?", a:"“My uncle. Along with a great deal else I did not ask for.”"},
+    {q:"Can we pull up floorboards, break down walls?", a:"“Do what you have to.” He means it — he would rather have a wrecked house he can sell than a whole one he cannot. Give them this permission clearly; they will want it in the basement."},
+    {q:"Can we have more money?", a:"He will go to twenty-five a day if pressed with a good reason, and no further. He is not rich, he is stuck."},
+    {q:"Who else has looked at the place?", a:"“Two agents. Neither would take it on. One of them would not go back for his own hat.” He says this as a joke and it does not land."}
+  ],
   sounds:"Fast, and slightly too much of it. He fills his own silences.",
   wants:"The house off his books without ever having to say the word haunted out loud.",
   manner:"He keeps almost saying the important thing and then not saying it. Starts a sentence about the previous tenants, changes his mind, moves on. Straightens things on the desk.",
@@ -2037,6 +2047,15 @@ knott:{
 },
 arty:{
   name:"Arty Wilmot", role:"Editor at the Boston Globe, guards the clippings morgue",
+  asks:[
+    {q:"We need to see the clippings files.", a:"“Need.” He lets that sit. “A great many people need things from this newspaper.”"},
+    {q:"We are working for the owner of the property.", a:"“Then the owner may write to us.” This is the opening for Persuade — he has just told them what a good argument would look like."},
+    {q:"Who are you to stop us?", a:"He straightens. “I am the man whose name is on the door of that basement.” Aggression works, but it is Intimidate, and a failed push brings the maintenance men."},
+    {q:"Do you know anything about the Corbitt House?", a:"He does not, and it visibly annoys him. “Should I?” If they tell him, he becomes fractionally more interested and fractionally more obstructive."},
+    {q:"Can we speak to someone in charge?", a:"“You are.” Untrue in any meaningful sense, and he is daring them to test it."},
+    {q:"We will pay you.", a:"Genuine offence, which is also genuine opportunity — he is offended because he wanted respect, not money. Treat a follow-up apology as a bonus die on Charm."},
+    {q:"We are writing a story of our own.", a:"Fast Talk territory. “Freelance.” The word tastes bad in his mouth. “For whom?”"}
+  ],
   sounds:"Slow and self-important, leaving gaps for you to be impressed in.",
   wants:"To be treated as a significant man. The morgue is the only power he has and he is going to enjoy it.",
   manner:"He repeats your own words back at you as though holding them up to the light. He never quite says no — he says that is not how we do things.",
@@ -2053,6 +2072,13 @@ arty:{
 },
 ruth:{
   name:"Ruth Blake", role:"Records keeper in the Globe morgue",
+  asks:[
+    {q:"How far back does this go?", a:"“Seventy-eight. There was a fire. Everything before that is ash and hearsay.” This is the useful one — it explains the gap and sends them to the Hall of Records."},
+    {q:"Do you remember anything about that house?", a:"“I file, I do not read.” Beat. “Though I would remember that address.” She does not know why, and that unsettles her slightly."},
+    {q:"Can we take these away?", a:"“You can copy them out. That is what the desk is for.” She provides a pencil without being asked."},
+    {q:"Has anybody else been asking?", a:"“Not in my time. And I have been here nineteen years.”"},
+    {q:"How do we get past Mr. Wilmot?", a:"A long look. “Ask him about the Harding piece. He wrote it. He will tell you at length.” This is a genuine gift — treat it as a bonus die on the next social roll against Arty."}
+  ],
   sounds:"Warm and unhurried. She talks while she works and never stops moving.",
   wants:"Company. Nobody comes down here.",
   manner:"Narrates her own filing. Now that will be under the street, not the family, people always get that wrong.",
@@ -2063,6 +2089,13 @@ ruth:{
 },
 recordsclerk:{
   name:"The Hall of Records clerk", role:"Counter clerk",
+  asks:[
+    {q:"Where are the 1912 records?", a:"“There is a reference. There is no file.” He checks twice, because he does not like it either."},
+    {q:"Who was Walter Corbitt?", a:"“A name on a deed and a will. That is all this building knows about anybody.”"},
+    {q:"Can we see the will?", a:"Yes, and it is Handout 7 — the executor, and the Chapel of Contemplation."},
+    {q:"Who do we talk to about a police raid?", a:"“Not me. Serious matters went to the county or the commonwealth. And if officers were involved, Central will hold the arrest records.” This is the pointer to Location 5."},
+    {q:"Is a file ever just gone?", a:"“Files are misfiled. Files are not removed.” He says it flatly, and it is the closest he comes to an opinion."}
+  ],
   sounds:"Flat, literal, unhurried. Answers exactly the question asked and no more.",
   wants:"To finish his shift without an incident.",
   manner:"Does not look up until addressed as a person rather than as a machine. Then he is perfectly decent.",
@@ -2073,6 +2106,13 @@ recordsclerk:{
 },
 debrun:{
   name:"Kim Debrun", role:"Court clerk, and an old contact",
+  asks:[
+    {q:"Can you get us the file?", a:"Warm Kim: “Give me ten minutes and do not touch anything.” Bad Kim: the same words, then a pause that goes on slightly too long."},
+    {q:"What do you want for it?", a:"Warm Kim is offended in a friendly way: “Buy me lunch and we are square.” Bad Kim names a number, takes it, and comes back empty-handed with a story."},
+    {q:"Is this going to get you in trouble?", a:"“Everything in this building is going to get somebody in trouble eventually.” Both versions say this. It is a good line and it tells them nothing."},
+    {q:"What happened at that chapel?", a:"“Before my time. But people who were here do not talk about it, and that is unusual in a courthouse.”"},
+    {q:"Do we know each other?", a:"Both versions insist yes, warmly, with a specific shared memory. Only one of them is telling the truth about what that friendship is worth."}
+  ],
   sounds:"Quick and amused, treating them like old friends from the first sentence.",
   wants:"Depends entirely on the concealed Law roll — and the players must not be able to tell which one they got.",
   manner:"Both versions open identically. That is the whole trick. The divergence is a single beat of hesitation before the price is named.",
@@ -2083,6 +2123,14 @@ debrun:{
 },
 dooley:{
   name:"Mr. Dooley", role:"Sells cigars and newspapers on the corner",
+  asks:[
+    {q:"What do you know about that house?", a:"“What do I know, he asks.” Delighted. This is the whole six-fact rush if his reaction was good."},
+    {q:"Have you ever been inside?", a:"“I have not, and I will tell you who else has not: anybody.” He is enjoying himself."},
+    {q:"Is it haunted?", a:"“I sell cigars. You want a ghost, buy a magazine.” Then, quieter, without the performance: “The father screamed for a week. You could hear it out here.”"},
+    {q:"Where was the old chapel?", a:"He points, gives them a street name, and adds that nobody goes down there because the ground is bad."},
+    {q:"Who else lives on this block?", a:"“Nobody. Offices, offices, offices, and that.” He does not look at the house while he says it."},
+    {q:"Are you sure about that?", a:"He is never sure. He will happily revise a detail if challenged, which is your licence to reshape anything you said by accident."}
+  ],
   sounds:"Fast and loud, and he never finishes one story before starting the next.",
   wants:"An audience, and to sell you something while he has one.",
   manner:"Interrupts himself to greet people passing, then picks up mid-sentence exactly where he left off. Do this two or three times and your wife will know Dooley by the interruptions alone.",
@@ -2098,6 +2146,13 @@ dooley:{
 },
 vittorio:{
   name:"Vittorio Macario", role:"The father, at Roxbury Sanitarium, quite mad",
+  asks:[
+    {q:"Anything at all, before the line", a:"He does not answer. He does not appear to hear. Let two or three questions go by completely unanswered before he speaks — the silence is what makes the line land."},
+    {q:"What did you see?", a:"Nothing. He turns a page."},
+    {q:"What is in the basement?", a:"This is the one that reaches him. He stops moving entirely. Then the bible opens and he delivers the line."},
+    {q:"Say that again?", a:"He will not. He says something else, unrelated and unhelpful — a fragment about the weather, or somebody's name. The clue is offered exactly once."},
+    {q:"Do you know who we are?", a:"“You are going to the house.” Not a question. Then nothing more."}
+  ],
   sounds:"Long silence, then suddenly too loud, and aimed slightly past whoever is speaking.",
   wants:"Nothing you can reach. He is not in the conversation.",
   manner:"Holds a bible against his chest with both arms, the way you hold something that is trying to get away. Does not register that people are there until, abruptly, he does.",
@@ -2108,6 +2163,15 @@ vittorio:{
 },
 gabriela:{
   name:"Gabriela Macario", role:"The mother, at Roxbury, lucid",
+  asks:[
+    {q:"What did you see?", a:"“At night. Leaning over the bed.” She will describe posture and position, never a face."},
+    {q:"What did it look like?", a:"“I have thought about that for a year and I cannot tell you.” She is not being evasive. She genuinely cannot hold the memory still."},
+    {q:"Did it hurt you?", a:"“It did not touch me.” Pause. “It touched everything else in the room.”"},
+    {q:"Why did it hate your husband?", a:"“I have asked God that.” She has no answer, and the lack of one is clearly the worst part for her."},
+    {q:"Why did you not leave?", a:"“We had paid a year.” Then, harder: “You have never been poor.” This should sting."},
+    {q:"Did anyone else see it?", a:"“The boys had dreams. I told them they were dreams.” She does not believe that any more."},
+    {q:"What should we do?", a:"The only time she is direct: “Do not sleep in that house.”"}
+  ],
   sounds:"Quiet, careful and controlled. She has rehearsed how to say this without sounding mad.",
   wants:"To be believed. And not to have to think about it any longer than necessary.",
   manner:"She says it and never he. Precise about small details, vague and reluctant about the thing itself.",
@@ -2120,6 +2184,11 @@ gabriela:{
 },
 boys:{
   name:"The Macario boys", role:"The children, with relatives in Baltimore",
+  asks:[
+    {q:"What do you remember?", a:"“The upstairs room was cold. Not the others. Just that one.” Neither of them can say which room, only that they both avoided it."},
+    {q:"Did you ever see him?", a:"The older one looks at the younger. “In the dreams.” That is as far as either will go."},
+    {q:"Do you want to talk about your parents?", a:"They do, badly, and it is very hard to watch. Let the players decide how long to stay."}
+  ],
   sounds:"One of them answers. The other does not. The one who talks keeps checking with his brother.",
   wants:"To go home, to parents who are not coming back.",
   manner:"Careful, polite, and watching your face to see whether they are in trouble.",
@@ -2129,6 +2198,16 @@ boys:{
 },
 corbitt:{
   name:"Walter Corbitt", role:"The undead sorcerer beneath the house",
+  asks:[
+    {q:"What are you?", a:"“Older than this street.” He is proud of it. He is also lying about the interesting part."},
+    {q:"Are you Walter Corbitt?", a:"“He was. I am what he was working towards.” This is true and it is the most he will ever explain."},
+    {q:"What do you want?", a:"“To be left. And to be entertained. You have managed one of those.”"},
+    {q:"Leave us alone and we will go.", a:"He agrees instantly and warmly, and means none of it. If they turn their backs, the knife does not."},
+    {q:"We will destroy you.", a:"Delight. “With what? The little gun? Ask the man in the asylum how the little gun went.” He is baiting them into wasting a round."},
+    {q:"Can we bargain? Take the book, take anything.", a:"He is genuinely interested in the Liber Ivonis and will draw the negotiation out — not to make a deal, but because it splits the group. Let a real argument start between the players. That is him winning."},
+    {q:"What did you do to the Macarios?", a:"“I asked them to leave. For a year. Politely, at first.”"},
+    {q:"Directed at one investigator", a:"Go at their backstory. To the Author: “You wanted to see one. Look properly.” To the detective: “Say it again. Say there is no such thing.” To the student: “Your father is not coming back either.” To the professor: “Does the little girl know where you are tonight?”"}
+  ],
   sounds:"He does not breathe, so he does not pause where a person pauses. Run a long line all the way through in one go, with no breath in the middle. It is unsettling out of all proportion to how simple it is.",
   wants:"Amusement, division, and any Mythos knowledge they have carried into his house.",
   manner:"Never plain speech — he growls, screeches, cackles and mocks. He is full of malice and will actively try to turn the investigators against one another.",
@@ -2429,6 +2508,19 @@ function renderNPC(parent, id){
       ul.appendChild(li);
     });
     wrap.appendChild(ul);
+  }
+
+  if(n.asks && n.asks.length){
+    const ah = document.createElement("h4");
+    ah.textContent = "If they ask";
+    wrap.appendChild(ah);
+    const dl = document.createElement("dl");
+    n.asks.forEach(function(x){
+      const dt = document.createElement("dt"); dt.textContent = x.q;
+      const dd = document.createElement("dd"); dd.textContent = x.a;
+      dl.appendChild(dt); dl.appendChild(dd);
+    });
+    wrap.appendChild(dl);
   }
 
   if(n.responds && n.responds.length){

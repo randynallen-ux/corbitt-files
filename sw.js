@@ -4,7 +4,7 @@
    with no signal, and quietly refresh the cache in the background when there
    is a connection. Bump CACHE when the app changes. */
 
-const CACHE = "corbitt-v1";
+const CACHE = "corbitt-v2";
 
 const ASSETS = [
   "./",
